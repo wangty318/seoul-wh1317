@@ -1,0 +1,4 @@
+src/seoul-routes.html
+__pycache__/
+node_modules/
+*.pyc

@@ -1,0 +1,453 @@
+<title>新村出發路線圖</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=Noto+Sans+TC:wght@400;500;700&display=swap">
+<style>
+  /* Layout: hub-and-spoke map centred on Sinchon (home), then one step-list card per destination.
+     Line colours follow Seoul Metro: Line 2 green, Line 3 orange, Line 4 blue, AREX sky blue. */
+  :root {
+    --bg: #f2f6f3;
+    --surface: #ffffff;
+    --fg: #14231d;
+    --muted: #53635b;
+    --line: #d5ded9;
+    --accent: #007d3f;
+    --accent-soft: #e1f3e8;
+    --on-accent: #ffffff;
+    --warn: #8a5200;
+    --warn-bg: #fff1d6;
+    --l2: #00a84d;
+    --l3: #e8710a;
+    --l4: #1a9ad6;
+    --larex: #0b86c9;
+    --font-body: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", system-ui, sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0e1613;
+      --surface: #16211d;
+      --fg: #e6efe9;
+      --muted: #9db0a6;
+      --line: #2a3a34;
+      --accent: #4cd98c;
+      --accent-soft: #163326;
+      --on-accent: #08130e;
+      --warn: #f2b84b;
+      --warn-bg: #33270d;
+      --l2: #3fd27f;
+      --l3: #ff9a4d;
+      --l4: #5cc4f0;
+      --larex: #5db8ee;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0e1613;
+    --surface: #16211d;
+    --fg: #e6efe9;
+    --muted: #9db0a6;
+    --line: #2a3a34;
+    --accent: #4cd98c;
+    --accent-soft: #163326;
+    --on-accent: #08130e;
+    --warn: #f2b84b;
+    --warn-bg: #33270d;
+    --l2: #3fd27f;
+    --l3: #ff9a4d;
+    --l4: #5cc4f0;
+    --larex: #5db8ee;
+    color-scheme: dark;
+  }
+
+  body { background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 15px; line-height: 1.7; }
+  .wrap { max-width: 720px; margin-inline: auto; padding-inline: 16px; padding-block: 20px 56px; }
+  h1, h2, h3, p, ul, ol, dl, dd { margin: 0; }
+  h1, h2, h3 { text-wrap: balance; line-height: 1.3; }
+  ul, ol { padding: 0; list-style: none; }
+  a { color: var(--accent); }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .nav {
+    position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5;
+    background: var(--bg); border-bottom: 1px solid var(--line);
+    margin-inline: -16px; padding: 8px 16px;
+    display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none;
+  }
+  .nav::-webkit-scrollbar { display: none; }
+  .nav a {
+    flex: none; text-decoration: none; color: var(--fg); font-size: 14px; font-weight: 500;
+    padding: 4px 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface);
+  }
+  .nav a:hover { border-color: var(--accent); color: var(--accent); }
+
+  .hero { display: flex; flex-direction: column; gap: 12px; padding-block: 24px 4px; }
+  .eyebrow { font-family: var(--font-mono); font-size: 12.5px; letter-spacing: 0.06em; color: var(--muted); text-transform: uppercase; }
+  h1 { font-size: clamp(1.7rem, 6.4vw, 2.3rem); font-weight: 700; letter-spacing: -0.01em; }
+  .lede { color: var(--muted); max-width: 34em; }
+
+  section { display: flex; flex-direction: column; gap: 14px; padding-top: 32px; scroll-margin-top: 56px; }
+  h2 { font-size: 1.3rem; font-weight: 700; }
+  .section-note { color: var(--muted); font-size: 14px; }
+
+  /* Map */
+  .map { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 8px; }
+  .map svg { display: block; width: 100%; height: auto; max-width: 100%; font-family: var(--font-body); }
+  .ln { fill: none; stroke-width: 6; stroke-linecap: round; stroke-linejoin: round; }
+  .ln2 { stroke: var(--l2); }
+  .ln3 { stroke: var(--l3); }
+  .lnA { stroke: var(--larex); }
+  .ghost { stroke: var(--l2); opacity: 0.45; stroke-dasharray: 2 7; }
+  .dot { fill: var(--surface); stroke-width: 2.5; }
+  .dot2 { stroke: var(--l2); }
+  .dot3 { stroke: var(--l3); }
+  .hub { fill: var(--surface); stroke: var(--fg); stroke-width: 2.5; }
+  .home { fill: var(--accent); stroke: var(--surface); stroke-width: 3; }
+  .nb { fill: var(--fg); }
+  .nt { fill: var(--bg); font-family: var(--font-mono); font-weight: 600; font-size: 12px; text-anchor: middle; }
+  .tx { fill: var(--fg); font-size: 11.5px; font-weight: 500; }
+  .tm { fill: var(--muted); font-size: 10.5px; }
+  .tb { fill: var(--fg); font-size: 12.5px; font-weight: 700; }
+  .end { text-anchor: end; }
+  .mid { text-anchor: middle; }
+  .legend { display: flex; flex-wrap: wrap; gap: 6px 16px; padding: 8px 8px 4px; font-size: 13px; color: var(--muted); }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .sw { width: 22px; height: 6px; border-radius: 3px; display: inline-block; }
+
+  .guide { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 6px 16px; }
+  .guide li { padding-block: 10px; border-bottom: 1px solid var(--line); }
+  .guide li:last-child { border-bottom: 0; }
+  .guide b { font-weight: 700; }
+  .ko { font-family: var(--font-body); color: var(--muted); font-size: 0.92em; }
+
+  .tablewrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+  table { border-collapse: collapse; width: 100%; font-size: 14px; }
+  th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font-weight: 500; color: var(--muted); font-size: 13px; white-space: nowrap; }
+  tr:last-child td { border-bottom: 0; }
+  td.cnt, th.cnt { font-variant-numeric: tabular-nums; min-width: 6.2rem; }
+  td.cnt b { font-weight: 700; }
+  .ix { font-family: var(--font-body); font-weight: 700; }
+
+  /* Route cards */
+  .routes { display: grid; gap: 14px; }
+  .route { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 12px; scroll-margin-top: 60px; }
+  .rhead { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+  .num {
+    flex: none; width: 28px; height: 28px; border-radius: 50%;
+    background: var(--fg); color: var(--bg);
+    display: grid; place-items: center;
+    font-family: var(--font-mono); font-weight: 600; font-size: 14px;
+  }
+  .rt { flex: 1; min-width: 9rem; display: flex; flex-direction: column; }
+  .rt h3 { font-size: 1.1rem; font-weight: 700; }
+  .rt span { color: var(--muted); font-size: 13.5px; }
+  .meta { text-align: right; display: flex; flex-direction: column; font-size: 13px; color: var(--muted); }
+  .meta b { color: var(--fg); font-size: 15px; font-weight: 700; }
+
+  .steps { display: grid; gap: 0; }
+  .s {
+    --c: var(--muted);
+    border-left: 5px solid var(--c);
+    padding: 8px 0 8px 14px;
+    display: grid; grid-template-columns: 4.4rem minmax(0, 1fr); gap: 10px; align-items: baseline;
+  }
+  .s .k { font-family: var(--font-mono); font-size: 12.5px; color: var(--muted); }
+  .s .d { min-width: 0; }
+  .c2 { --c: var(--l2); }
+  .c3 { --c: var(--l3); }
+  .c4 { --c: var(--l4); }
+  .cA { --c: var(--larex); }
+  .cw { --c: var(--line); border-left-style: dashed; }
+  .tag { display: inline-block; font-size: 12.5px; font-weight: 500; padding: 0 8px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); margin-left: 4px; }
+  .back, .note { border-radius: 8px; padding: 10px 14px; font-size: 14.5px; }
+  .back { background: var(--accent-soft); }
+  .note { background: var(--warn-bg); }
+  .back b, .note b { font-weight: 700; }
+
+  footer { margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; display: grid; gap: 6px; }
+  footer ul { display: flex; flex-wrap: wrap; gap: 4px 14px; }
+
+  @media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+</style>
+
+<div class="wrap">
+  <nav class="nav" aria-label="目的地">
+    <a href="#map">路線圖</a>
+    <a href="#r1">① 樂天</a>
+    <a href="#r2">② 光藏</a>
+    <a href="#r3">③ APM</a>
+    <a href="#r4">④ 新羅</a>
+    <a href="#r5">⑤ 新沙</a>
+    <a href="#r6">⑥ 聖水</a>
+    <a href="#r7">⑦ 弘大</a>
+    <a href="#r8">⑧ 機場</a>
+  </nav>
+
+  <header class="hero">
+    <p class="eyebrow">Sinchon · 신촌 · Line 2</p>
+    <h1>新村出發路線圖</h1>
+    <p class="lede">以住宿 Ever8（新村站 2 號線）為中心，列出每個行程點該搭哪條線、哪個方向、幾站、哪個出口，還有回程怎麼搭。</p>
+  </header>
+
+  <section id="map">
+    <h2>路線圖</h2>
+    <p class="section-note">示意圖，距離與位置不是實際比例。圓圈裡的數字對應下面的路線卡，點數字可跳過去。</p>
+    <div class="map">
+      <svg viewBox="0 0 400 392" role="img" aria-label="以新村為中心的地鐵示意圖：2 號線內環往市廳、乙支路、東大門、聖水；3 號線從乙支路3街往東國大與新沙；機場鐵路從弘大入口往仁川機場。">
+        <!-- Line 2 (inner direction) -->
+        <path class="ln ln2" d="M110,205 C120,150 175,112 255,108 C335,104 378,165 372,250"/>
+        <path class="ln ln2" d="M36,218 C60,214 85,209 110,205"/>
+        <path class="ln ghost" d="M372,250 L372,292"/>
+        <!-- Line 3 -->
+        <path class="ln ln3" d="M288,110 C284,200 300,250 285,345"/>
+        <!-- AREX -->
+        <path class="ln lnA" d="M36,218 L36,330"/>
+
+        <!-- Line 2 small stations -->
+        <circle class="dot dot2" cx="121" cy="174" r="4"/>
+        <circle class="dot dot2" cx="142" cy="148" r="4"/>
+        <circle class="dot dot2" cx="172" cy="128" r="4"/>
+        <circle class="dot dot2" cx="210" cy="114" r="4"/>
+        <circle class="dot dot2" cx="356" cy="162" r="4"/>
+        <circle class="dot dot2" cx="364" cy="181" r="4"/>
+        <circle class="dot dot2" cx="370" cy="202" r="4"/>
+        <circle class="dot dot2" cx="372" cy="225" r="4"/>
+        <!-- Line 3 small stations -->
+        <circle class="dot dot3" cx="287" cy="148" r="4"/>
+        <circle class="dot dot3" cx="290" cy="217" r="4"/>
+        <circle class="dot dot3" cx="291" cy="243" r="4"/>
+        <circle class="dot dot3" cx="292" cy="269" r="4"/>
+        <circle class="dot dot3" cx="290" cy="303" r="4"/>
+
+        <!-- Interchange: Euljiro 3-ga -->
+        <circle class="hub" cx="288" cy="110" r="7"/>
+        <text class="tm end" x="278" y="136">乙支路3街（換3號線）</text>
+        <text class="tm mid" x="210" y="99">市廳</text>
+
+        <!-- Home -->
+        <circle class="home" cx="110" cy="205" r="10"/>
+        <text class="tb mid" x="110" y="232">新村・住宿</text>
+        <text class="tm end" x="108" y="168">內環 往市廳</text>
+        <text class="tm mid" x="70" y="198">外環</text>
+
+        <!-- Numbered destinations -->
+        <a href="#r1"><circle class="nb" cx="255" cy="108" r="11"/><text class="nt" x="255" y="112.5">1</text></a>
+        <text class="tx mid" x="255" y="86">樂天百貨</text>
+
+        <a href="#r2"><circle class="nb" cx="320" cy="123" r="11"/><text class="nt" x="320" y="127.5">2</text></a>
+        <text class="tx mid" x="328" y="100">光藏市場</text>
+
+        <a href="#r3"><circle class="nb" cx="346" cy="146" r="11"/><text class="nt" x="346" y="150.5">3</text></a>
+        <text class="tx end" x="333" y="171">APM</text>
+
+        <a href="#r4"><circle class="nb" cx="289" cy="187" r="11"/><text class="nt" x="289" y="191.5">4</text></a>
+        <text class="tx" x="304" y="191">新羅免稅</text>
+
+        <a href="#r5"><circle class="nb" cx="285" cy="345" r="11"/><text class="nt" x="285" y="349.5">5</text></a>
+        <text class="tx" x="301" y="349">新沙</text>
+
+        <a href="#r6"><circle class="nb" cx="372" cy="250" r="11"/><text class="nt" x="372" y="254.5">6</text></a>
+        <text class="tx end" x="357" y="254">聖水</text>
+        <text class="tm end" x="396" y="308">內環續行</text>
+        <text class="tm end" x="396" y="322">往江南</text>
+
+        <a href="#r7"><circle class="nb" cx="36" cy="218" r="11"/><text class="nt" x="36" y="222.5">7</text></a>
+        <text class="tx mid" x="36" y="198">弘大</text>
+
+        <a href="#r8"><circle class="nb" cx="36" cy="330" r="11"/><text class="nt" x="36" y="334.5">8</text></a>
+        <text class="tx" x="54" y="334">仁川機場 T1</text>
+        <text class="tm" x="54" y="349">機場鐵路 一般列車</text>
+      </svg>
+      <div class="legend">
+        <span><i class="sw" style="background:var(--l2)"></i>2 號線</span>
+        <span><i class="sw" style="background:var(--l3)"></i>3 號線</span>
+        <span><i class="sw" style="background:var(--larex)"></i>機場鐵路</span>
+      </div>
+    </div>
+  </section>
+
+  <section id="guide">
+    <h2>怎麼認班次</h2>
+    <div class="guide">
+      <ul>
+        <li><b>2 號線是環狀線，月台看「內環／外環」，不是看終點站。</b>從新村往梨大、市廳走是<b>內環</b> <span class="ko">내선순환</span>；往弘大入口走是<b>外環</b> <span class="ko">외선순환</span>。</li>
+        <li><b>回程方向和去程相反。</b>去聖水搭內環，回新村要搭外環，搭錯會繞約 29 站，時間差不多兩倍。</li>
+        <li><b>3 號線</b>往五輪 <span class="ko">오금</span> 是南下（往新沙），往大化 <span class="ko">대화</span> 是北上。</li>
+        <li><b>機場鐵路只有「一般列車」</b> <span class="ko">일반열차</span> 停弘大入口，直通列車 <span class="ko">직통열차</span> 不停。</li>
+        <li><b>逐班發車時間我沒有，也不編。</b>出發前在 Naver Map 或 Kakao Map 輸入起訖站，會顯示下一班與換乘月台。下面的分鐘數是依站數推算的，不是官方時刻。</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="table">
+    <h2>快速對照</h2>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>目的地</th><th>搭法</th><th class="cnt">站數・時間</th></tr></thead>
+        <tbody>
+          <tr><td><span class="ix">①</span> 樂天百貨・明洞</td><td>2 號線內環 → 乙支路入口</td><td class="cnt"><b>5 站</b><br>約 12 分</td></tr>
+          <tr><td><span class="ix">②</span> 光藏市場</td><td>2 號線內環 → 乙支路4街 4 號口</td><td class="cnt"><b>7 站</b><br>約 16 分</td></tr>
+          <tr><td><span class="ix">③</span> 東大門 APM</td><td>2 號線內環 → 東大門歷史文化公園 14 號口</td><td class="cnt"><b>8 站</b><br>約 18 分</td></tr>
+          <tr><td><span class="ix">④</span> 新羅免稅店</td><td>2 號線到乙支路3街 → 3 號線到東國大入口 5 號口 → 接駁車</td><td class="cnt"><b>6 + 2 站</b><br>約 25 分＋接駁</td></tr>
+          <tr><td><span class="ix">⑤</span> 新沙站 3 號口</td><td>2 號線到乙支路3街 → 3 號線往五輪到新沙</td><td class="cnt"><b>6 + 7 站</b><br>約 40 分</td></tr>
+          <tr><td><span class="ix">⑥</span> 聖水洞</td><td>2 號線內環直達，不用換乘</td><td class="cnt"><b>14 站</b><br>約 30 分</td></tr>
+          <tr><td><span class="ix">⑦</span> 弘大 AK Plaza</td><td>2 號線外環 → 弘大入口 4 號口</td><td class="cnt"><b>1 站</b><br>約 3 分</td></tr>
+          <tr><td><span class="ix">⑧</span> 仁川機場 T1</td><td>2 號線外環 → 弘大入口 → 機場鐵路一般列車</td><td class="cnt"><b>1 站 + 機鐵</b><br>約 60–70 分</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="routes">
+    <h2>每條路線的步驟</h2>
+    <div class="routes">
+
+      <article class="route" id="r1">
+        <div class="rhead">
+          <span class="num">1</span>
+          <div class="rt"><h3>樂天百貨・明洞</h3><span>D1 10/13 · 也順路新世界百貨</span></div>
+          <div class="meta"><b>5 站</b><span>約 12 分</span></div>
+        </div>
+        <ol class="steps">
+          <li class="s c2"><span class="k">搭乘</span><span class="d">新村站搭 2 號線 <b>內環</b>，往梨大 <span class="ko">이대</span>、市廳 <span class="ko">시청</span> 方向</span></li>
+          <li class="s c2"><span class="k">5 站</span><span class="d">梨大 → 阿峴 → 忠正路 → 市廳 → <b>乙支路入口</b> <span class="ko">을지로입구</span></span></li>
+          <li class="s cw"><span class="k">出站</span><span class="d">乙支路入口站是離樂天百貨本店最近的站，明洞購物街就在附近，步行可達。</span></li>
+          <li class="s c4"><span class="k">新世界</span><span class="d">本店在會賢站 <span class="ko">회현</span>（4 號線）7 號口直通。從明洞站 <span class="ko">명동</span> 往烏耳島 <span class="ko">오이도</span> 方向搭 4 號線 1 站，或從明洞站 5 號口步行約 5 分。</span></li>
+        </ol>
+        <p class="back"><b>回程：</b>乙支路入口站搭 2 號線 <b>外環</b>，往市廳方向 5 站回新村。</p>
+      </article>
+
+      <article class="route" id="r2">
+        <div class="rhead">
+          <span class="num">2</span>
+          <div class="rt"><h3>光藏市場</h3><span>D3 10/15</span></div>
+          <div class="meta"><b>7 站</b><span>約 16 分</span></div>
+        </div>
+        <ol class="steps">
+          <li class="s c2"><span class="k">搭乘</span><span class="d">新村站搭 2 號線 <b>內環</b>，往梨大、市廳方向</span></li>
+          <li class="s c2"><span class="k">7 站</span><span class="d">梨大 → 阿峴 → 忠正路 → 市廳 → 乙支路入口 → 乙支路3街 → <b>乙支路4街</b> <span class="ko">을지로4가</span></span></li>
+          <li class="s cw"><span class="k">出站</span><span class="d">走 <b>4 號口</b>，直走過清溪川，市場入口在右手邊。</span></li>
+          <li class="s cw"><span class="k">備案</span><span class="d">1 號線鐘路5街站 <span class="ko">종로5가</span> 8 號口也可以到。</span></li>
+        </ol>
+        <p class="back"><b>回程：</b>乙支路4街站搭 2 號線 <b>外環</b>，往乙支路3街方向 7 站回新村。</p>
+      </article>
+
+      <article class="route" id="r3">
+        <div class="rhead">
+          <span class="num">3</span>
+          <div class="rt"><h3>東大門 APM</h3><span>D3 10/15 20:00</span></div>
+          <div class="meta"><b>8 站</b><span>約 18 分</span></div>
+        </div>
+        <ol class="steps">
+          <li class="s c2"><span class="k">搭乘</span><span class="d">新村站搭 2 號線 <b>內環</b>，往梨大、市廳方向</span></li>
+          <li class="s c2"><span class="k">8 站</span><span class="d">梨大 → 阿峴 → 忠正路 → 市廳 → 乙支路入口 → 乙支路3街 → 乙支路4街 → <b>東大門歷史文化公園</b> <span class="ko">동대문역사문화공원</span></span></li>
+          <li class="s cw"><span class="k">出站</span><span class="d"><b>14 號口</b>通 APM、Good Morning City、Doosan Tower；<b>1 號口</b>通東大門設計廣場（DDP）。</span></li>
+        </ol>
+        <p class="note"><b>夜間：</b>20:00 才進 APM，回程會偏晚。先看地鐵末班時間，趕不上就叫 Kakao T。</p>
+        <p class="back"><b>回程：</b>東大門歷史文化公園站搭 2 號線 <b>外環</b>，往乙支路4街方向 8 站回新村。</p>
+      </article>
+
+      <article class="route" id="r4">
+        <div class="rhead">
+          <span class="num">4</span>
+          <div class="rt"><h3>新羅免稅店</h3><span>D3 10/15 · 在獎忠洞，不在東大門商圈</span></div>
+          <div class="meta"><b>6 + 2 站</b><span>約 25 分＋接駁</span></div>
+        </div>
+        <ol class="steps">
+          <li class="s c2"><span class="k">搭乘</span><span class="d">新村站搭 2 號線 <b>內環</b>，往梨大、市廳方向</span></li>
+          <li class="s c2"><span class="k">6 站</span><span class="d">梨大 → 阿峴 → 忠正路 → 市廳 → 乙支路入口 → <b>乙支路3街</b> <span class="ko">을지로3가</span></span></li>
+          <li class="s c3"><span class="k">換乘</span><span class="d">換 <b>3 號線</b>，往五輪 <span class="ko">오금</span> 方向</span></li>
+          <li class="s c3"><span class="k">2 站</span><span class="d">忠武路 <span class="ko">충무로</span> → <b>東國大入口</b> <span class="ko">동국대입구</span></span></li>
+          <li class="s cw"><span class="k">出站</span><span class="d">走 <b>5 號口</b>，搭新羅飯店的接駁車到免稅店正門。</span></li>
+        </ol>
+        <p class="note"><b>營業時間：</b>官網寫 09:30–20:00，每天營業。這家在新羅飯店內，行程裡它和東大門是不同方向，建議 D3 早上先去。</p>
+        <p class="back"><b>回程：</b>東國大入口站搭 3 號線往大化 <span class="ko">대화</span> 方向 2 站到乙支路3街，換 2 號線 <b>外環</b>往乙支路入口方向 6 站回新村。</p>
+      </article>
+
+      <article class="route" id="r5">
+        <div class="rhead">
+          <span class="num">5</span>
+          <div class="rt"><h3>新沙站 3 號口</h3><span>D2 10/14 18:30</span></div>
+          <div class="meta"><b>6 + 7 站</b><span>約 40 分</span></div>
+        </div>
+        <ol class="steps">
+          <li class="s c2"><span class="k">搭乘</span><span class="d">新村站搭 2 號線 <b>內環</b>，往梨大、市廳方向</span></li>
+          <li class="s c2"><span class="k">6 站</span><span class="d">梨大 → 阿峴 → 忠正路 → 市廳 → 乙支路入口 → <b>乙支路3街</b></span></li>
+          <li class="s c3"><span class="k">換乘</span><span class="d">換 <b>3 號線</b>，往五輪 <span class="ko">오금</span> 方向</span></li>
+          <li class="s c3"><span class="k">7 站</span><span class="d">忠武路 → 東國大入口 → 藥水 <span class="ko">약수</span> → 金湖 <span class="ko">금호</span> → 玉水 <span class="ko">옥수</span> → 狎鷗亭 <span class="ko">압구정</span> → <b>新沙</b> <span class="ko">신사</span></span></li>
+          <li class="s cw"><span class="k">出站</span><span class="d">走 <b>3 號口</b>。診所地址請在 Naver Map 查，從 3 號口出來的步行路線以地圖為準。</span></li>
+        </ol>
+        <p class="note"><b>出發時間：</b>從預約時間往前推至少 1 小時，地鐵約 40 分，再加上找路和報到。</p>
+        <p class="back"><b>回程（夜間）：</b>不要搭地鐵。用 Kakao T 叫車直接回新村，目的地貼公寓韓文地址，上車前把車牌傳給家人。</p>
+      </article>
+
+      <article class="route" id="r6">
+        <div class="rhead">
+          <span class="num">6</span>
+          <div class="rt"><h3>聖水洞</h3><span>D2 10/14 白天</span></div>
+          <div class="meta"><b>14 站</b><span>約 30 分，不換乘</span></div>
+        </div>
+        <ol class="steps">
+          <li class="s c2"><span class="k">搭乘</span><span class="d">新村站搭 2 號線 <b>內環</b>，一路坐到聖水</span></li>
+          <li class="s c2"><span class="k">14 站</span><span class="d">梨大 → 阿峴 → 忠正路 → 市廳 → 乙支路入口 → 乙支路3街 → 乙支路4街 → 東大門歷史文化公園 → 新堂 → 上往十里 → 往十里 → 漢陽大 → 纛島 → <b>聖水</b> <span class="ko">성수</span></span></li>
+          <li class="s cw"><span class="k">出站</span><span class="d">各家店用 Naver Map 搜店名，依地圖挑最近的出口。</span></li>
+        </ol>
+        <p class="note"><b>最容易搭錯的是回程：</b>聖水站要搭 <b>外環</b>（往纛島 <span class="ko">뚝섬</span> 方向）。搭到內環會往江南繞一大圈，約 29 站。</p>
+        <p class="back"><b>回程：</b>聖水站搭 2 號線 <b>外環</b>，14 站回新村。</p>
+      </article>
+
+      <article class="route" id="r7">
+        <div class="rhead">
+          <span class="num">7</span>
+          <div class="rt"><h3>弘大（AK Plaza）</h3><span>D4 10/16</span></div>
+          <div class="meta"><b>1 站</b><span>約 3 分</span></div>
+        </div>
+        <ol class="steps">
+          <li class="s c2"><span class="k">搭乘</span><span class="d">新村站搭 2 號線 <b>外環</b>，往弘大入口 <span class="ko">홍대입구</span> 方向</span></li>
+          <li class="s c2"><span class="k">1 站</span><span class="d"><b>弘大入口</b></span></li>
+          <li class="s cw"><span class="k">出站</span><span class="d"><b>4 號口</b>是 AK Plaza Hongdae 的入口。</span></li>
+        </ol>
+        <p class="back"><b>回程：</b>弘大入口站搭 2 號線 <b>內環</b>往新村 1 站。晚上直接用 Kakao T，距離很短。</p>
+      </article>
+
+      <article class="route" id="r8">
+        <div class="rhead">
+          <span class="num">8</span>
+          <div class="rt"><h3>仁川機場 T1</h3><span>D1 抵達 10/13 · D5 出發 10/17</span></div>
+          <div class="meta"><b>機鐵 + 1 站</b><span>約 60–70 分</span></div>
+        </div>
+        <p class="k" style="font-family:var(--font-mono);font-size:12.5px;color:var(--muted)">D1 抵達：仁川機場 → 住宿</p>
+        <ol class="steps">
+          <li class="s cA"><span class="k">搭乘</span><span class="d">機場鐵路 <b>一般列車</b> <span class="ko">일반열차</span>，往首爾站 <span class="ko">서울역</span> 方向。直通列車不停弘大入口，別搭錯。</span></li>
+          <li class="s cA"><span class="k">約 50 分</span><span class="d">在 <b>弘大入口</b> 下車</span></li>
+          <li class="s c2"><span class="k">換乘</span><span class="d">換 2 號線 <b>內環</b>往新村 1 站</span></li>
+          <li class="s cw"><span class="k">步行</span><span class="d">新村站走到公寓約 10 分鐘。行李多的話，這段可以改叫車。</span></li>
+        </ol>
+        <p class="k" style="font-family:var(--font-mono);font-size:12.5px;color:var(--muted)">D5 出發：住宿 → 仁川機場</p>
+        <ol class="steps">
+          <li class="s c2"><span class="k">搭乘</span><span class="d">新村站搭 2 號線 <b>外環</b> 1 站到弘大入口</span></li>
+          <li class="s cA"><span class="k">換乘</span><span class="d">機場鐵路 <b>一般列車</b>，往仁川機場2航廈 <span class="ko">인천공항2터미널</span> 方向，在 <b>T1（第一航廈）</b>下車，約 50 分。</span></li>
+        </ol>
+        <p class="note"><b>班次：</b>一般列車平日尖峰約 5–6 分一班，其他時段約 15 分。第三方資料寫 T1 首班約 05:25，D1 落地後出關通常已有車。D5 建議 18:00 左右離開市區。</p>
+      </article>
+
+    </div>
+  </section>
+
+  <footer>
+    <p>資料來源。站名順序、出口與營業時間引自下列頁面，其中 3 號線站序與機場鐵路首班時間是我整理的，出發前請用 Naver Map 或 Kakao Map 核對。</p>
+    <ul>
+      <li><a href="https://en.wikipedia.org/wiki/Sinchon_station" target="_blank" rel="noopener">Sinchon station</a></li>
+      <li><a href="https://en.wikipedia.org/wiki/Euljiro_1(il)-ga_station" target="_blank" rel="noopener">Euljiro 1-ga station</a></li>
+      <li><a href="https://en.wikipedia.org/wiki/Dongdaemun_History_%26_Culture_Park_station" target="_blank" rel="noopener">Dongdaemun History &amp; Culture Park</a></li>
+      <li><a href="https://en.wikipedia.org/wiki/Hongik_University_station" target="_blank" rel="noopener">Hongik University station</a></li>
+      <li><a href="https://shilladfs.com/comm/kr/en/storeMain?org_cd=01" target="_blank" rel="noopener">The Shilla Duty Free Seoul</a></li>
+      <li><a href="https://creatrip.com/en/blog/4867/Summary-of-Transportation-to-Dongdaemun" target="_blank" rel="noopener">Creatrip 東大門交通</a></li>
+      <li><a href="https://www.ivisitkorea.com/gwangjang-market-in-seoul/" target="_blank" rel="noopener">iVisitKorea 光藏市場</a></li>
+      <li><a href="https://koreatodo.com/shinsegae-department-store" target="_blank" rel="noopener">Koreatodo 新世界百貨</a></li>
+      <li><a href="https://blog.myezl.com/공항철도-직통열차-일반열차-시간표-노선-요금-정리/" target="_blank" rel="noopener">機場鐵路班次</a></li>
+      <li><a href="https://www.treksplorer.com/seoul-arex-airport-express-train/" target="_blank" rel="noopener">Treksplorer AREX</a></li>
+    </ul>
+  </footer>
+</div>

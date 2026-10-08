@@ -4,10 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>首爾自由行手冊</title>
+<meta name="build-id" content="9c08ad899b04">
+<meta name="robots" content="noindex,nofollow">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
-<meta name="robots" content="noindex,nofollow">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="首爾手冊">
@@ -1189,21 +1190,29 @@
   else if (days.indexOf(h) >= 0) { cur.top = 'routes'; cur.day = h; }
   paint();
 })();
-</script><style>
+</script><p class="buildinfo">版本 9c08ad8 · 更新於 10/08 23:25</p>
+<style>
   .topbar-in.has-offl { grid-template-columns: 1fr 1fr auto; }
   .offl { font: inherit; font-size: 13px; font-weight: 600; line-height: 1.2; padding: 0 10px; border-radius: 10px;
     border: 1px solid transparent; background: transparent; color: var(--muted); white-space: nowrap; cursor: pointer; }
   .offl[data-state="ok"] { color: var(--accent); }
   .offl[data-state="bad"] { color: var(--alert); background: var(--alert-bg); border-color: var(--alert); }
+  .offl[data-state="update"] { color: var(--on-accent); background: var(--accent); border-color: var(--accent); }
+  .buildinfo { margin: 0; padding: 0 16px 28px; text-align: center; font-size: 12px; line-height: 1.5; color: var(--muted); }
 </style>
 <script>
-/* 離線狀態：向 service worker 問「該存的檔案是不是都在快取裡」，把真實結果顯示在頂部列 */
+/* 離線與更新狀態：向 service worker 問「該存的檔案是不是都在快取裡、頁面是不是最新版」，結果顯示在頂部列。
+   「↻ 有新版本」＝ service worker 已拿到新版，但目前畫面還是舊的，點一下重新載入即可。 */
 (function () {
   var bar = document.querySelector('.topbar-in');
   if (!bar || !('serviceWorker' in navigator) || !window.caches || !/^https?:$/.test(location.protocol)) return;
+  var meta = document.querySelector('meta[name="build-id"]');
+  var PAGE_BUILD = meta ? meta.getAttribute('content') : '';
   var pill = document.createElement('button');
   pill.type = 'button'; pill.className = 'offl'; pill.hidden = true;
   bar.classList.add('has-offl'); bar.appendChild(pill);
+  var reg = null, hadCtl = !!navigator.serviceWorker.controller, lastPoke = 0;
+
   function show(state, txt, label) { pill.hidden = false; pill.dataset.state = state; pill.textContent = txt; pill.setAttribute('aria-label', label); }
   function ask(worker, msg) {
     return new Promise(function (res) {
@@ -1212,23 +1221,41 @@
       worker.postMessage(msg, [ch.port2]);
     });
   }
-  var reg = null;
+  function bad() { show('bad', '! 未存好', '離線資料還沒存好，連上網路後點一下重試'); }
   function check() {
     var timeout = new Promise(function (_, rej) { setTimeout(function () { rej(new Error('sw timeout')); }, 6000); });
     return Promise.race([navigator.serviceWorker.ready, timeout]).then(function (r) {
       reg = r; return ask(r.active, { type: 'status' });
     }).then(function (s) {
-      if (s && s.ok) show('ok', '✓ 離線可用', '資料已存好，沒網路也能開');
-      else show('bad', '! 未存好', '離線資料還沒存好，連上網路後點一下重試');
-    }).catch(function () { show('bad', '! 未存好', '離線資料還沒存好，連上網路後點一下重試'); });
+      if (!s || !s.ok) bad();
+      else if (s.build && PAGE_BUILD && s.build !== PAGE_BUILD) show('update', '↻ 有新版本', '有新版本，點一下更新');
+      else show('ok', '✓ 離線可用', '資料已存好，沒網路也能開');
+    }).catch(bad);
   }
+  function poke() {            // 回到前景、恢復連線、定時：問一次有沒有新版（只會下載很小的 sw.js）
+    if (!reg || document.visibilityState !== 'visible') return;
+    var now = Date.now();
+    if (now - lastPoke < 60000) return;
+    lastPoke = now;
+    reg.update().then(function () { setTimeout(check, 400); }).catch(function () {});
+  }
+
   pill.addEventListener('click', function () {
-    if (pill.dataset.state === 'ok' || !reg || !reg.active) { check(); return; }
+    var st = pill.dataset.state;
+    if (st === 'update') { location.reload(); return; }
+    if (st === 'ok' || !reg || !reg.active) { check(); return; }
     show('wait', '存檔中…', '正在存離線資料');
     ask(reg.active, { type: 'precache' }).then(check);
   });
+  navigator.serviceWorker.addEventListener('controllerchange', function () {
+    if (hadCtl) setTimeout(check, 300); else hadCtl = true;
+  });
+  document.addEventListener('visibilitychange', poke);
+  window.addEventListener('online', poke);
+  setInterval(poke, 10 * 60 * 1000);
+
   show('wait', '存檔中…', '正在存離線資料');
-  navigator.serviceWorker.register('sw.js', { scope: './' }).catch(function () {}).then(check);
+  navigator.serviceWorker.register('sw.js', { scope: './' }).then(function (r) { reg = r; }).catch(function () {}).then(check);
 })();
 </script>
 </body>

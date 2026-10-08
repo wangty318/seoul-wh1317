@@ -1,0 +1,566 @@
+<title>首爾行程安全卡</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=Noto+Sans+TC:wght@400;500;700&display=swap">
+<style>
+  /* Layout: mobile-first single column. Timetable rows (time in mono at left), one card per day,
+     Seoul Line 2 green as the only accent; amber and red are reserved for caution levels. */
+  :root {
+    --bg: #f2f6f3;
+    --surface: #ffffff;
+    --fg: #14231d;
+    --muted: #53635b;
+    --line: #d5ded9;
+    --accent: #007d3f;
+    --accent-soft: #e1f3e8;
+    --on-accent: #ffffff;
+    --warn: #8a5200;
+    --warn-bg: #fff1d6;
+    --alert: #b3261e;
+    --alert-bg: #fde7e4;
+    --font-body: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", system-ui, sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0e1613;
+      --surface: #16211d;
+      --fg: #e6efe9;
+      --muted: #9db0a6;
+      --line: #2a3a34;
+      --accent: #4cd98c;
+      --accent-soft: #163326;
+      --on-accent: #08130e;
+      --warn: #f2b84b;
+      --warn-bg: #33270d;
+      --alert: #ff9a90;
+      --alert-bg: #3a1916;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0e1613;
+    --surface: #16211d;
+    --fg: #e6efe9;
+    --muted: #9db0a6;
+    --line: #2a3a34;
+    --accent: #4cd98c;
+    --accent-soft: #163326;
+    --on-accent: #08130e;
+    --warn: #f2b84b;
+    --warn-bg: #33270d;
+    --alert: #ff9a90;
+    --alert-bg: #3a1916;
+    color-scheme: dark;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.7;
+  }
+  .wrap {
+    max-width: 720px;
+    margin-inline: auto;
+    padding-inline: 16px;
+    padding-block: 20px 56px;
+  }
+  h1, h2, h3, p, ul, dl, dd { margin: 0; }
+  h1, h2, h3 { text-wrap: balance; line-height: 1.3; }
+  ul { padding: 0; list-style: none; }
+  a { color: var(--accent); }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  /* Sticky section nav */
+  .nav {
+    position: sticky;
+    top: env(safe-area-inset-top, 0px);
+    z-index: 5;
+    background: var(--bg);
+    border-bottom: 1px solid var(--line);
+    margin-inline: -16px;
+    padding: 8px 16px;
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .nav::-webkit-scrollbar { display: none; }
+  .nav a {
+    flex: none;
+    text-decoration: none;
+    color: var(--fg);
+    font-size: 14px;
+    font-weight: 500;
+    padding: 4px 12px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--surface);
+  }
+  .nav a:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* Hero */
+  .hero { display: flex; flex-direction: column; gap: 14px; padding-block: 24px 8px; }
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+  h1 { font-size: clamp(1.7rem, 6.4vw, 2.3rem); font-weight: 700; letter-spacing: -0.01em; }
+  .lede { color: var(--muted); max-width: 34em; }
+
+  .stay {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .stay-top { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .line-badge {
+    flex: none;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: var(--on-accent);
+    display: grid;
+    place-items: center;
+    font-family: var(--font-mono);
+    font-weight: 600;
+    font-size: 14px;
+  }
+  .stay-name { font-weight: 700; }
+  .stay-meta { color: var(--muted); font-size: 14px; }
+  .addr-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .addr {
+    font-size: 17px;
+    font-weight: 500;
+    background: var(--accent-soft);
+    padding: 4px 10px;
+    border-radius: 6px;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  .btn {
+    font: inherit;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--accent);
+    background: transparent;
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    padding: 4px 12px;
+    cursor: pointer;
+  }
+  .btn:hover { background: var(--accent-soft); }
+
+  /* Sections */
+  section { display: flex; flex-direction: column; gap: 14px; padding-top: 36px; scroll-margin-top: 56px; }
+  h2 { font-size: 1.3rem; font-weight: 700; }
+  .section-note { color: var(--muted); font-size: 14px; }
+
+  /* Emergency */
+  .sos { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+  .sos-tile {
+    background: var(--alert-bg);
+    border-radius: 10px;
+    padding: 12px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .sos-num { font-family: var(--font-mono); font-weight: 600; font-size: clamp(1.5rem, 7vw, 2rem); color: var(--alert); line-height: 1.2; }
+  .sos-label { font-size: 13.5px; line-height: 1.45; }
+  .fields { display: grid; gap: 12px; }
+  .field { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+  .field label { font-size: 14px; color: var(--muted); }
+  .field input {
+    font: inherit;
+    font-size: 16px;
+    color: var(--fg);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 9px 12px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .field input::placeholder { color: var(--muted); opacity: 0.8; }
+
+  /* Flights */
+  .flights { display: grid; gap: 12px; }
+  .flight {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .flight-head { display: flex; gap: 10px; align-items: center; font-weight: 700; }
+  .tag {
+    font-size: 12.5px;
+    font-weight: 500;
+    background: var(--accent-soft);
+    color: var(--accent);
+    padding: 1px 10px;
+    border-radius: 999px;
+  }
+  .leg { display: grid; grid-template-columns: 4.2rem 1fr; gap: 12px; align-items: baseline; }
+  .t { font-family: var(--font-mono); font-weight: 600; font-size: 1.35rem; font-variant-numeric: tabular-nums; }
+  .leg-place { min-width: 0; }
+  .leg-sub { color: var(--muted); font-size: 13px; }
+  .flight-note { font-size: 14px; color: var(--muted); border-top: 1px dashed var(--line); padding-top: 8px; }
+
+  /* Days */
+  .days { display: grid; gap: 14px; }
+  .day {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .day-head { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+  .day-no {
+    flex: none;
+    font-family: var(--font-mono);
+    font-weight: 600;
+    font-size: 14px;
+    background: var(--accent);
+    color: var(--on-accent);
+    border-radius: 6px;
+    padding: 2px 9px;
+  }
+  .day-title { flex: 1; min-width: 8rem; display: flex; flex-direction: column; }
+  .day-title h3 { font-size: 1.12rem; font-weight: 700; }
+  .day-date { color: var(--muted); font-size: 13.5px; }
+  .pill { flex: none; font-size: 12.5px; font-weight: 500; padding: 1px 10px; border-radius: 999px; }
+  .pill.l1 { background: var(--warn-bg); color: var(--warn); }
+  .pill.l2 { background: var(--alert-bg); color: var(--alert); }
+  .rows { display: grid; gap: 10px; }
+  .row { display: grid; grid-template-columns: 4.6rem minmax(0, 1fr); gap: 12px; align-items: baseline; }
+  .row dt { font-family: var(--font-mono); font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .row dd { min-width: 0; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip {
+    font-size: 13.5px;
+    line-height: 1.5;
+    padding: 1px 10px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--bg);
+  }
+  .notes { border-radius: 8px; padding: 12px 14px; display: grid; gap: 6px; font-size: 14.5px; }
+  .notes.l1 { background: var(--warn-bg); }
+  .notes.l2 { background: var(--alert-bg); }
+  .notes li { padding-left: 1em; position: relative; }
+  .notes li::before { content: "·"; position: absolute; left: 0; font-weight: 700; }
+
+  /* Lists */
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 6px 16px; }
+  .plain li { padding-block: 10px; border-bottom: 1px solid var(--line); }
+  .plain li:last-child { border-bottom: 0; }
+  .plain b { font-weight: 700; }
+  .checks li { border-bottom: 1px solid var(--line); }
+  .checks li:last-child { border-bottom: 0; }
+  .checks label { display: flex; gap: 12px; align-items: flex-start; padding-block: 10px; cursor: pointer; }
+  .checks input { flex: none; width: 20px; height: 20px; margin: 3px 0 0; accent-color: var(--accent); }
+  .checks .when { font-family: var(--font-mono); font-size: 13px; color: var(--muted); display: block; }
+  .group-title { font-size: 1rem; font-weight: 700; margin-top: 6px; }
+  .checks input:checked + span { color: var(--muted); text-decoration: line-through; text-decoration-color: var(--line); }
+
+  .callout { background: var(--warn-bg); border-radius: 10px; padding: 12px 16px; font-size: 14.5px; }
+
+  footer { margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; display: grid; gap: 4px; }
+
+  @media (min-width: 640px) {
+    .flights { grid-template-columns: 1fr 1fr; }
+    .fields { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    html { scroll-behavior: smooth; }
+  }
+</style>
+
+<div class="wrap">
+  <nav class="nav" aria-label="頁面章節">
+    <a href="#emergency">緊急資訊</a>
+    <a href="#flights">航班</a>
+    <a href="#days">每日行程</a>
+    <a href="#safety">安全習慣</a>
+    <a href="#checklist">清單</a>
+  </nav>
+
+  <header class="hero">
+    <p class="eyebrow">Seoul · 10/13 – 10/17 · 4 nights</p>
+    <h1>首爾五日行程安全卡</h1>
+    <p class="lede">航班、住宿、每日行程與夜間回程重點，放在同一頁。出發前存成手機截圖，遇到狀況時不用翻訊息。</p>
+
+    <div class="stay">
+      <div class="stay-top">
+        <span class="line-badge" aria-hidden="true">2</span>
+        <span class="stay-name">Ever8 Serviced Residence（新村）</span>
+      </div>
+      <p class="stay-meta">首爾地鐵 2 號線新村站，步行約 10 分鐘內 · 每晚入住 · 入住 15:00 / 退房 12:00</p>
+      <div class="addr-row">
+        <span class="addr" id="addr-ko">서울 서대문구 신촌역로 7</span>
+        <button class="btn" type="button" data-copy-target="addr-ko">複製地址</button>
+      </div>
+      <p class="stay-meta">給計程車司機看這行韓文地址。入住與退房時間請以訂房確認信為準。</p>
+    </div>
+  </header>
+
+  <section id="emergency">
+    <h2>緊急資訊</h2>
+    <div class="sos">
+      <div class="sos-tile"><span class="sos-num">112</span><span class="sos-label">警察</span></div>
+      <div class="sos-tile"><span class="sos-num">119</span><span class="sos-label">消防與救護</span></div>
+      <div class="sos-tile"><span class="sos-num">1330</span><span class="sos-label">旅遊諮詢（有中文）</span></div>
+    </div>
+    <p class="section-note">下面三格請出發前自行查最新號碼填入，只存在這支手機的瀏覽器裡。</p>
+    <div class="fields">
+      <div class="field">
+        <label for="f-office">駐韓台北代表部緊急電話</label>
+        <input id="f-office" type="text" inputmode="tel" placeholder="出發前填入">
+      </div>
+      <div class="field">
+        <label for="f-mofa">外交部旅外國人急難救助專線</label>
+        <input id="f-mofa" type="text" inputmode="tel" placeholder="出發前填入">
+      </div>
+      <div class="field">
+        <label for="f-ins">保險公司緊急電話與保單號碼</label>
+        <input id="f-ins" type="text" placeholder="出發前填入">
+      </div>
+    </div>
+  </section>
+
+  <section id="flights">
+    <h2>航班</h2>
+    <div class="flights">
+      <div class="flight">
+        <div class="flight-head"><span class="tag">去程</span><span>10/13（二）</span></div>
+        <div class="leg"><span class="t">02:00</span><span class="leg-place">桃園國際機場 T1<br><span class="leg-sub">TPE · 台北</span></span></div>
+        <div class="leg"><span class="t">05:30</span><span class="leg-place">仁川機場 T1<br><span class="leg-sub">ICN · 首爾</span></span></div>
+        <p class="flight-note">凌晨起飛，需在 10/12（一）晚上就到機場。公寓 15:00 才能入住，先問能否寄放行李。</p>
+      </div>
+      <div class="flight">
+        <div class="flight-head"><span class="tag">回程</span><span>10/17（六）</span></div>
+        <div class="leg"><span class="t">23:00</span><span class="leg-place">仁川機場 T1<br><span class="leg-sub">ICN · 首爾</span></span></div>
+        <div class="leg"><span class="t">00:35</span><span class="leg-place">桃園國際機場 T1<br><span class="leg-sub">TPE · 台北 · 10/18（日）</span></span></div>
+        <p class="flight-note">出關後約凌晨 1 點多，大眾運輸大多已收班，請先安排接機或預約車輛。</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="days">
+    <h2>每日行程</h2>
+    <p class="section-note">標籤是夜間與人潮的留意程度，不代表該區域危險。</p>
+    <div class="days">
+
+      <article class="day">
+        <div class="day-head">
+          <span class="day-no">D1</span>
+          <div class="day-title"><h3>明洞</h3><span class="day-date">10/13（二）</span></div>
+          <span class="pill l1">留意：扒竊、行李</span>
+        </div>
+        <dl class="rows">
+          <div class="row"><dt>05:30</dt><dd>抵達仁川 T1</dd></div>
+          <div class="row"><dt>早上</dt><dd>機場汗蒸幕</dd></div>
+          <div class="row"><dt>白天</dt><dd><div class="chips"><span class="chip">樂天百貨</span><span class="chip">新世界百貨</span><span class="chip">Nyunyu</span><span class="chip">8 seconds</span><span class="chip">MIXXO</span><span class="chip">MLB</span><span class="chip">Verish</span><span class="chip">Ept</span></div></dd></div>
+          <div class="row"><dt>晚餐</dt><dd>無垢屋</dd></div>
+        </dl>
+        <ul class="notes l1">
+          <li>明洞觀光客最多，扒竊與詐騙最常見，包包前背、拉鍊朝內。</li>
+          <li>剛下夜班機，警覺性比平常低，晚餐後早點回住處。</li>
+          <li>行李先寄放公寓，不要拖著行李逛街。</li>
+        </ul>
+      </article>
+
+      <article class="day">
+        <div class="day-head">
+          <span class="day-no">D2</span>
+          <div class="day-title"><h3>聖水洞</h3><span class="day-date">10/14（三）</span></div>
+          <span class="pill l2">特別留意：夜間回程</span>
+        </div>
+        <dl class="rows">
+          <div class="row"><dt>白天</dt><dd><div class="chips"><span class="chip">自然道鹽麵包</span><span class="chip">Stand oil</span><span class="chip">Wacky willy</span><span class="chip">Tamburins</span><span class="chip">Double lover</span><span class="chip">North face white label</span><span class="chip">Human made</span><span class="chip">Matin Kim</span><span class="chip">Satur</span><span class="chip">Atiissu</span></div></dd></div>
+          <div class="row"><dt>18:30</dt><dd>新沙站 3 號口（閨蜜雙眼皮手術）</dd></div>
+          <div class="row"><dt>晚餐</dt><dd>祖傳三代馬鈴薯排骨湯</dd></div>
+        </dl>
+        <ul class="notes l2">
+          <li>這是整趟最需要照顧的時段：術後的人視力與行動力會下降，另一人負責手機與導航。</li>
+          <li>回新村一律叫 Kakao T，上車前截圖車牌傳給家人，不要走路或轉乘地鐵。</li>
+          <li>新沙站在江南區，夜間人流較雜，離開診所後直接上車。</li>
+        </ul>
+      </article>
+
+      <article class="day">
+        <div class="day-head">
+          <span class="day-no">D3</span>
+          <div class="day-title"><h3>東大門</h3><span class="day-date">10/15（四）</span></div>
+          <span class="pill l1">留意：人潮、末班車</span>
+        </div>
+        <dl class="rows">
+          <div class="row"><dt>白天</dt><dd><div class="chips"><span class="chip">廣藏市場</span><span class="chip">新羅免稅店</span><span class="chip">Nyunyu</span></div></dd></div>
+          <div class="row"><dt>晚餐</dt><dd>陳玉華奶奶一隻雞</dd></div>
+          <div class="row"><dt>20:00</dt><dd>APM</dd></div>
+        </dl>
+        <ul class="notes l1">
+          <li>東大門商圈人潮擁擠，留意扒竊，貴重物品放在貼身的內袋。</li>
+          <li>20:00 才進 APM，結束時間偏晚。趕不上地鐵末班（接近午夜）就叫車。</li>
+        </ul>
+      </article>
+
+      <article class="day">
+        <div class="day-head">
+          <span class="day-no">D4</span>
+          <div class="day-title"><h3>弘大</h3><span class="day-date">10/16（五）</span></div>
+          <span class="pill l2">特別留意：夜間酒吧區</span>
+        </div>
+        <dl class="rows">
+          <div class="row"><dt>白天</dt><dd><div class="chips"><span class="chip">KT&amp;G</span><span class="chip">時空間</span><span class="chip">Mucent</span><span class="chip">As"on</span><span class="chip">Musinsa standard</span><span class="chip">Covernat</span><span class="chip">SPAO</span><span class="chip">8 seconds</span><span class="chip">Daiso</span><span class="chip">AK Plaza 2F（with mu）</span></div></dd></div>
+          <div class="row"><dt>晚餐</dt><dd>git tteul</dd></div>
+        </dl>
+        <ul class="notes l2">
+          <li>週五晚上的弘大人最多，酒吧、夜店、拉客和搭訕都集中在這裡，不理會、不停留。</li>
+          <li>晚餐後直接回住處，不續攤。弘大到新村只有一小段，叫車即可。</li>
+          <li>飲料不離身，不接受陌生人遞的飲品或食物。</li>
+        </ul>
+      </article>
+
+      <article class="day">
+        <div class="day-head">
+          <span class="day-no">D5</span>
+          <div class="day-title"><h3>返程日</h3><span class="day-date">10/17（六）</span></div>
+          <span class="pill l1">留意：深夜航班</span>
+        </div>
+        <dl class="rows">
+          <div class="row"><dt>12:00</dt><dd>公寓退房（以訂房確認信為準）</dd></div>
+          <div class="row"><dt>白天</dt><dd>尚未安排，出發前決定去哪、行李放哪</dd></div>
+          <div class="row"><dt>~18:00</dt><dd>建議離開市區</dd></div>
+          <div class="row"><dt>~19:30</dt><dd>建議抵達仁川 T1，留時間退稅與託運</dd></div>
+          <div class="row"><dt>23:00</dt><dd>起飛，10/18 00:35 抵達桃園 T1</dd></div>
+        </dl>
+        <ul class="notes l1">
+          <li>退房後到出發前有 7 到 8 小時，先問公寓能否寄放行李，免得全天拖著走。</li>
+          <li>去機場可搭機場鐵路（AREX，弘大入口站可上車），班次與時間出發前再確認。</li>
+          <li>落地時間已是凌晨，回家的車請提前安排好。</li>
+        </ul>
+      </article>
+
+    </div>
+  </section>
+
+  <section id="safety">
+    <h2>安全習慣</h2>
+    <div class="card">
+      <ul class="plain">
+        <li><b>夜間叫車</b>：用 Kakao T 叫車並綁定信用卡，上車前截圖車牌傳給家人。</li>
+        <li><b>同進同出</b>：兩人夜間不單獨行動，也不要在酒吧、夜店區獨自逗留。</li>
+        <li><b>飲料不離身</b>：不接受陌生人遞的飲品或食物。</li>
+        <li><b>包包前背</b>：拉鍊朝內，不帶多餘現金，護照影本拍照存雲端。</li>
+        <li><b>位置晚點發</b>：社群貼文回台灣後再發，不要即時標記位置。</li>
+        <li><b>住宿確認</b>：入住時檢查房門鎖、陽台門窗，必要時可帶簡易門擋。</li>
+        <li><b>防身用品</b>：防狼噴霧受航空與海關限制，不建議帶。發聲警報器通常較沒問題，出發前確認航空公司規定。</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="checklist">
+    <h2>清單</h2>
+    <p class="section-note">勾選狀態只存在這支手機的瀏覽器裡，換裝置或清除網站資料會重置。</p>
+
+    <h3 class="group-title">出發前</h3>
+    <div class="card">
+      <ul class="checks">
+        <li><label><input type="checkbox" id="c-ins"><span>旅遊保險：含醫療與緊急救援。確認保單條款，美容整形及其併發症通常不理賠。</span></label></li>
+        <li><label><input type="checkbox" id="c-net"><span>eSIM 或漫遊設定好，帶行動電源。</span></label></li>
+        <li><label><input type="checkbox" id="c-app"><span>安裝 Naver Map 或 Kakao Map、Papago、Kakao T。</span></label></li>
+        <li><label><input type="checkbox" id="c-addr"><span>公寓韓文地址截圖存在手機。</span></label></li>
+        <li><label><input type="checkbox" id="c-bag"><span>問公寓能否在 D1 入住前與 D5 退房後寄放行李。</span></label></li>
+        <li><label><input type="checkbox" id="c-share"><span>航班與行程分享給雙方家人。</span></label></li>
+        <li><label><input type="checkbox" id="c-ride1"><span>10/12 晚上到桃園機場的交通安排好。</span></label></li>
+        <li><label><input type="checkbox" id="c-ride2"><span>10/18 凌晨落地後的接機或預約車輛安排好。</span></label></li>
+        <li><label><input type="checkbox" id="c-num"><span>上方三格緊急電話填好，並截圖存起來。</span></label></li>
+      </ul>
+    </div>
+
+    <h3 class="group-title">報平安時間點</h3>
+    <div class="card">
+      <ul class="checks">
+        <li><label><input type="checkbox" id="r-1"><span><span class="when">10/12 晚</span>到達桃園機場</span></label></li>
+        <li><label><input type="checkbox" id="r-2"><span><span class="when">10/13 早</span>抵達仁川</span></label></li>
+        <li><label><input type="checkbox" id="r-3"><span><span class="when">10/13 下午</span>入住公寓放好行李</span></label></li>
+        <li><label><input type="checkbox" id="r-4"><span><span class="when">10/13 晚</span>回到公寓</span></label></li>
+        <li><label><input type="checkbox" id="r-5"><span><span class="when">10/14 晚</span>回到公寓（術後那晚，上車前先傳車牌）</span></label></li>
+        <li><label><input type="checkbox" id="r-6"><span><span class="when">10/15 晚</span>回到公寓</span></label></li>
+        <li><label><input type="checkbox" id="r-7"><span><span class="when">10/16 晚</span>回到公寓</span></label></li>
+        <li><label><input type="checkbox" id="r-8"><span><span class="when">10/17 晚</span>抵達仁川機場、登機前</span></label></li>
+        <li><label><input type="checkbox" id="r-9"><span><span class="when">10/18 凌晨</span>落地桃園，平安到家</span></label></li>
+      </ul>
+    </div>
+    <p class="callout">約好一條規則：超過兩小時沒回訊息，另一方就主動聯絡。</p>
+  </section>
+
+  <footer>
+    <p>住宿地址與入住時間參考 KAYAK 的 Ever8 Serviced Residence 頁面，請以訂房確認信為準。</p>
+    <p>緊急電話與機場鐵路班次等資訊可能更新，出發前請再查官方來源。</p>
+  </footer>
+</div>
+
+<script>
+(function () {
+  function get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+  function set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+
+  document.querySelectorAll('input[type="checkbox"][id]').forEach(function (el) {
+    if (get('seoul:' + el.id) === '1') el.checked = true;
+    el.addEventListener('change', function () { set('seoul:' + el.id, el.checked ? '1' : '0'); });
+  });
+
+  document.querySelectorAll('input[type="text"][id]').forEach(function (el) {
+    var v = get('seoul:' + el.id);
+    if (v) el.value = v;
+    el.addEventListener('input', function () { set('seoul:' + el.id, el.value); });
+  });
+
+  function selectText(node) {
+    var range = document.createRange();
+    range.selectNodeContents(node);
+    var sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+  }
+
+  document.querySelectorAll('[data-copy-target]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var node = document.getElementById(btn.getAttribute('data-copy-target'));
+      var original = btn.textContent;
+      function done(msg) {
+        btn.textContent = msg;
+        setTimeout(function () { btn.textContent = original; }, 1800);
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(node.textContent.trim()).then(
+          function () { done('已複製'); },
+          function () { selectText(node); done('已選取，請長按複製'); }
+        );
+      } else {
+        selectText(node);
+        done('已選取，請長按複製');
+      }
+    });
+  });
+})();
+</script>

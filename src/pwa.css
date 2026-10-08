@@ -1,0 +1,7 @@
+  .topbar-in.has-offl { grid-template-columns: 1fr 1fr auto; }
+  .offl { font: inherit; font-size: 13px; font-weight: 600; line-height: 1.2; padding: 0 10px; border-radius: 10px;
+    border: 1px solid transparent; background: transparent; color: var(--muted); white-space: nowrap; cursor: pointer; }
+  .offl[data-state="ok"] { color: var(--accent); }
+  .offl[data-state="bad"] { color: var(--alert); background: var(--alert-bg); border-color: var(--alert); }
+  .offl[data-state="update"] { color: var(--on-accent); background: var(--accent); border-color: var(--accent); }
+  .buildinfo { margin: 0; padding: 0 16px 28px; text-align: center; font-size: 12px; line-height: 1.5; color: var(--muted); }
