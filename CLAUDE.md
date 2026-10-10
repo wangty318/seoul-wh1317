@@ -55,5 +55,4 @@
 - D2 術後那晚 新沙 → 聖水 / 梨大 怎麼走：安全卡寫「一律叫 Kakao T」，路線頁把地鐵畫成備案，兩邊尚未統一。外國遊客能否註冊 Kakao T 各來源說法不一，建議寫成「Kakao T / k.ride / Uber 擇一，出發前先註冊並綁卡」。
 - D5 返程日行程（12:00 退房、23:00 班機）。
 - apM 20:00 是入場時間還是約會時間。
-- Google 地圖清單裡還沒排進哪一天的點：&meal Sandwich shop（鐘閣，Seorin-dong）、Dapeojwo（海鮮，祭基洞，離 D3 範圍較遠）。
 - iPhone 的 Apple Wallet T-money 只收 Mastercard / AmEx / 銀聯（Visa 不行，資料到 2026/4）；用 Visa 的人要買實體 T-money 卡。
