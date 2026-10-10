@@ -3,13 +3,13 @@
  *   頁面快取（index.html、manifest）：每次改行程都會換新。
  *   資源快取（圖示、1.7MB 地鐵圖）：圖不變就不會重新下載。
  * 策略：頁面（navigate）網路優先、強制向伺服器重新驗證，3 秒沒回應就用快取；其餘靜態檔快取優先。 */
-const PAGE_V = 'b62a86aedc';
-const ASSET_V = '9570e085c2';
-const BUILD_ID = '44255a72e7a8';
+const PAGE_V = '37b381e09e';
+const ASSET_V = 'c638688adc';
+const BUILD_ID = '276e3b2f543f';
 const PAGE_CACHE = 'seoul-page-' + PAGE_V;
 const ASSET_CACHE = 'seoul-assets-' + ASSET_V;
 const PAGE_FILES = ['./', './index.html', './manifest.webmanifest'];
-const ASSET_FILES = ['./icons/icon-192.png', './icons/icon-512.png', './icons/apple-touch-icon.png', './seoul-metro-map.jpg'];
+const ASSET_FILES = ['./icons/icon-192.png', './icons/icon-512.png', './icons/apple-touch-icon.png', './seoul-metro-map.jpg', './flights.jpg'];
 const NAV_TIMEOUT = 3000;
 
 async function precachePages() {

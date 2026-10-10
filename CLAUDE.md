@@ -13,7 +13,7 @@
 1. **取得推送權限**：`add_repo(owner="wangty318", repo="seoul-wh1317", access="push")`，照回傳指示 clone 後 `register_repo_root`。前提有兩個：使用者已在 claude.ai 連結 GitHub，且已在他的 GitHub 帳號安裝 Claude GitHub App 並授權這個 repo（https://github.com/apps/claude/installations/select_target）。若回傳 `push_check: refused`，代表第二項還沒做，推送會被拒絕，請使用者先完成。
 2. **改來源**（見「來源在哪」）。**不要手改**根目錄的 `index.html`（導向頁）與整個 `seoul-pwa/`（`index.html`、`sw.js`、`manifest.webmanifest`、`version.json`、`icons/`、`seoul-metro-map.jpg`），它們都是 build 產物。
 3. **重建**：`python3 src/build.py`（輸出到 `seoul-pwa/` 並更新根目錄導向頁；內容沒變時輸出完全相同，不會產生多餘的 git 變更）。
-4. **測試**：`NODE_PATH=$(npm root -g) node tests/pwa_test.js`（27 項）、`NODE_PATH=$(npm root -g) node tests/layout_test.js`（8 項，兩個網址都能開）與 `python3 tests/sync_test.py`（22 項，安全卡與路線兩個分頁的地點、日期、固定資訊要一致），必須全過。再用 Playwright 手機尺寸（390×844）截圖看改到的畫面。
+4. **測試**：`NODE_PATH=$(npm root -g) node tests/pwa_test.js`（29 項）、`NODE_PATH=$(npm root -g) node tests/layout_test.js`（8 項，兩個網址都能開）與 `python3 tests/sync_test.py`（22 項，安全卡與路線兩個分頁的地點、日期、固定資訊要一致），必須全過。再用 Playwright 手機尺寸（390×844）截圖看改到的畫面。
 5. **提交並推到 `main`**，commit 訊息用中文簡述改了什麼，結尾附上 session 規定的 attribution。
 6. **確認上線**：等 1–3 分鐘，WebFetch `https://wangty318.github.io/seoul-wh1317/seoul-pwa/version.json`，其中 `build` 要和本機 `seoul-pwa/version.json` 一致。
 7. **回報使用者**：改了什麼（白話）、版本號與更新時間、她們怎麼拿到（見下）。
@@ -23,7 +23,7 @@
 - App 一直開著或從背景回來：回到前景會檢查更新。有新版時頂部右側出現綠色「↻ 有新版本」，點一下重新載入。
 - 沒有網路：顯示上一次存好的版本。頁面最底下有「版本 xxxxxxx · 更新於 MM/DD HH:MM」，可請她們回報來核對有沒有拿到最新版。
 - 頂部右側的「✓ 離線可用」是 service worker 實際檢查快取後的結果；「! 未存好」表示有檔案沒存成功，連上網點一下重試。
-- 頁面與圖片資源分開快取：只改行程不會重新下載 1.7 MB 的地鐵圖。
+- 頁面與圖片資源分開快取（資源＝圖示、1.7 MB 地鐵圖、72 KB 航班截圖）：只改行程不會重新下載這些圖。**新增或換掉資源檔會讓資源版本號變動，已安裝的手機下次打開會重新下載一次地鐵圖**，不要為了小事動它。
 
 ## 來源在哪（全在 `src/`）
 | 要改什麼 | 去哪改 |
@@ -31,6 +31,7 @@
 | **每天的地點 chip**（午餐／逛的店／吃喝咖啡／晚餐／安國一帶） | `gen_site.py` 的 `PLACES`（**路線頁與安全卡的「每日行程」共用這一份**，改這裡兩邊一起變；安全卡那幾列由 `_srow`／`_swap_row` 產生，不要去手改 `seoul-safety.html` 裡的 chip）。營業時間與步行距離的說明仍寫在各天的 `notes([...])`（只在路線頁） |
 | 路線 D1–D5、總覽、怎麼認方向 | `gen_site.py`：`# ===== D1` … `# ===== overview` 各區塊（`dN_nodes` 是站點，`dN` 是整頁） |
 | 安全卡內容 | `seoul-safety.html`（原始），加上 `gen_site.py` 的 `sub(舊字串, 新字串)` 替換與 `DOCS`（證件與護照清單） |
+| 安全卡「航班」下面的「航班截圖」展開列 | `gen_site.py` 的 `SHOT_HTML`／`SHOT_CSS`（原生 `<details>`）；圖檔 `src/flights.jpg`（訂票 App 行程截圖，1080×938 JPEG，72 KB）。換圖時：先確認沒有姓名、訂位代號、機票號碼（repo 公開），尺寸若變了要同步改 `SHOT_HTML` 的 width／height 與 `pwa_test.js` 的 D12 |
 | 地鐵圖按鈕與縮放全螢幕 | `gen_site.py` 的 `MAPBLOCK`；圖檔 `seoul-metro-map.jpg`（全尺寸）、`metro-thumb.jpg`（縮圖，內嵌進頁面） |
 | 兩個大分頁與 hash 路由 | `gen_site.py` 的 `TOP_OPEN`、`TOPSCRIPT`、`EXTRA3` |
 | 共用的卡片／路線圖繪製函式 | `gen_v3_backup.py` 前半（`strip`、`card`、`head`…；只被 `exec` 前半段，後面是被改寫的舊外殼）；`seoul-routes-v2.html` 提供舊版 CSS |

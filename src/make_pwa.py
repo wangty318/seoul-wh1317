@@ -93,7 +93,7 @@ stamp = args.stamp or (prev['stamp'] if prev.get('build') == build and prev.get(
 index = index_tpl.replace('__BUILD_ID__', build).replace('__BUILD_ID7__', build[:7]).replace('__STAMP__', stamp)
 
 icons = sorted(os.listdir(os.path.join(HERE, 'icons')))
-asset_bytes = [rd('seoul-metro-map.jpg', 'rb')] + [rd('icons/' + n, 'rb') for n in icons]
+asset_bytes = [rd('seoul-metro-map.jpg', 'rb'), rd('flights.jpg', 'rb')] + [rd('icons/' + n, 'rb') for n in icons]
 asset_v = sha(*asset_bytes)[:10]
 sw_tpl = rd('sw.template.js')
 page_v = sha(index, manifest, sw_tpl)[:10]
@@ -107,6 +107,7 @@ for stale in os.listdir(os.path.join(OUT, 'icons')):
 for n in icons:
     shutil.copy(os.path.join(HERE, 'icons', n), os.path.join(OUT, 'icons', n))
 shutil.copy(os.path.join(HERE, 'seoul-metro-map.jpg'), os.path.join(OUT, 'seoul-metro-map.jpg'))
+shutil.copy(os.path.join(HERE, 'flights.jpg'), os.path.join(OUT, 'flights.jpg'))
 for name, text in [('index.html', index), ('manifest.webmanifest', manifest), ('sw.js', sw),
                    ('version.json', json.dumps(version, ensure_ascii=False, indent=2) + '\n')]:
     open(os.path.join(OUT, name), 'w', encoding='utf-8', newline='\n').write(text)

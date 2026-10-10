@@ -74,8 +74,8 @@ const ok = (name, cond, extra) => results.push([cond ? 'PASS' : 'FAIL', name, ex
   ok('A1 第一次載入後出現「✓ 離線可用」', await waitFor(pill, '✓'), await pill());
   const ck = await p.evaluate(async () => { const out = {}; for (const k of await caches.keys()) out[k] = (await (await caches.open(k)).keys()).map(r => new URL(r.url).pathname.replace('/seoul/', '')); return out; });
   const names = Object.keys(ck);
-  ok('A2 兩個快取：頁面快取＋資源快取，且內容齊全（含全尺寸地鐵圖）',
-    names.length === 2 && names.some(n => n.startsWith('seoul-page-') && ck[n].includes('index.html')) && names.some(n => n.startsWith('seoul-assets-') && ck[n].includes('seoul-metro-map.jpg')), JSON.stringify(ck));
+  ok('A2 兩個快取：頁面快取＋資源快取，且內容齊全（含全尺寸地鐵圖與航班截圖）',
+    names.length === 2 && names.some(n => n.startsWith('seoul-page-') && ck[n].includes('index.html')) && names.some(n => n.startsWith('seoul-assets-') && ck[n].includes('seoul-metro-map.jpg') && ck[n].includes('flights.jpg')), JSON.stringify(ck));
   await p.reload(); await sleep(800);
   ok('A3 service worker 已接管頁面', await p.evaluate(() => !!navigator.serviceWorker.controller));
   const info = await p.locator('.buildinfo').innerText();
@@ -129,6 +129,16 @@ const ok = (name, cond, extra) => results.push([cond ? 'PASS' : 'FAIL', name, ex
   await stop();
   await p.reload({ waitUntil: 'load' }); await sleep(600);
   ok('D10 更新後斷網：載到的是最新版（v3）', /更新測試v3/.test(await safetyText(p)));
+  const shot0 = await p.evaluate(() => { const d = document.getElementById('pane-safety').shadowRoot.querySelector('details.shot'); const r = document.getElementById('pane-safety').shadowRoot.getElementById('flights'); return d && { open: d.open, inFlights: r.contains(d), label: d.querySelector('summary').textContent.replace(/\s+/g, '') }; });
+  ok('D11 安全卡「航班」區塊下面有收合的「航班截圖」', shot0 && !shot0.open && shot0.inFlights && /航班截圖/.test(shot0.label), JSON.stringify(shot0));
+  const shot1 = await p.evaluate(async () => {
+    const d = document.getElementById('pane-safety').shadowRoot.querySelector('details.shot'); d.open = true;
+    const i = d.querySelector('img'); i.scrollIntoView();
+    await new Promise(r => { const t = setTimeout(r, 4000); const done = () => { clearTimeout(t); r(); }; if (i.complete && i.naturalWidth) done(); else { i.onload = done; i.onerror = done; } });
+    return { open: d.open, w: i.naturalWidth, h: i.naturalHeight, shownW: Math.round(i.getBoundingClientRect().width) };
+  });
+  ok('D12 斷網狀態下展開，航班截圖載得出來（來自離線快取），且寬度撐滿卡片', shot1.open && shot1.w === 1080 && shot1.h === 938 && shot1.shownW > 300, JSON.stringify(shot1));
+  await p.screenshot({ path: path.join(SHOT, 'd12-flight-shot-offline.png') });
   await ctx.close();
 
   // ================= F：第一次存檔時地圖失敗 → 顯示「未存好」→ 點一下重試 =================

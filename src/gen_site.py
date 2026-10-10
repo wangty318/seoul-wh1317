@@ -508,6 +508,28 @@ sub('弘大到新村只有一小段', '弘大到梨大只有一小段')
 sub('新沙站 3 號口（閨蜜雙眼皮手術）', '新沙站 3 號口（雙眼皮手術）')
 sub('<dd>APM</dd>', '<dd>apM</dd>')
 
+# 航班區塊下面的「航班截圖」展開列（圖檔 src/flights.jpg 是訂票 App 的行程截圖，只有航線與時間，沒有姓名／訂位代號）
+SHOT_HTML = '''    <details class="shot">
+      <summary><span>航班截圖</span><span class="chev" aria-hidden="true">▾</span></summary>
+      <img src="flights.jpg" width="1080" height="938" loading="lazy" decoding="async" alt="航班截圖：去程 10/13（二）02:00 桃園 TPE T1 起飛，05:30 抵達仁川 ICN T1；回程 10/17（六）23:00 仁川 ICN T1 起飛，10/18（日）00:35 抵達桃園 TPE T1">
+    </details>
+'''
+sub('    </div>\n  </section>\n\n  <section id="days">', '    </div>\n' + SHOT_HTML + '  </section>\n\n  <section id="days">')
+SHOT_CSS = '''
+  .shot { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+  .shot summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    box-sizing: border-box; min-height: 48px; padding: 12px 16px; font-weight: 700; }
+  .shot summary::-webkit-details-marker { display: none; }
+  .shot summary::marker { content: ''; }
+  .shot summary:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+  .shot .chev { color: var(--muted); transition: transform .15s; }
+  .shot[open] .chev { transform: rotate(180deg); }
+  .shot[open] summary { border-bottom: 1px solid var(--line); }
+  .shot img { display: block; width: 100%; height: auto; background: #fff; }
+  @media (prefers-reduced-motion: reduce) { .shot .chev { transition: none; } }
+'''
+s_css = s_css + SHOT_CSS
+
 
 def _srow(label, items):
     """安全卡一列：左邊標籤，右邊一排 chip（只列名字；連結與營業時間在路線頁）"""

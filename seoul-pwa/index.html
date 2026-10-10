@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>首爾自由行手冊</title>
-<meta name="build-id" content="44255a72e7a8">
+<meta name="build-id" content="276e3b2f543f">
 <meta name="robots" content="noindex,nofollow">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/icon-192.png">
@@ -541,6 +541,18 @@
     .flights { grid-template-columns: 1fr 1fr; }
     .fields { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   }
+
+  .shot { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+  .shot summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    box-sizing: border-box; min-height: 48px; padding: 12px 16px; font-weight: 700; }
+  .shot summary::-webkit-details-marker { display: none; }
+  .shot summary::marker { content: ''; }
+  .shot summary:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+  .shot .chev { color: var(--muted); transition: transform .15s; }
+  .shot[open] .chev { transform: rotate(180deg); }
+  .shot[open] summary { border-bottom: 1px solid var(--line); }
+  .shot img { display: block; width: 100%; height: auto; background: #fff; }
+  @media (prefers-reduced-motion: reduce) { .shot .chev { transition: none; } }
 </style><div class="wrap">
   <nav class="nav" aria-label="頁面章節">
     <a href="#emergency" data-goto="emergency">緊急資訊</a>
@@ -609,6 +621,10 @@
         <p class="flight-note">出關後約凌晨 1 點多，大眾運輸大多已收班，請先安排接機或預約車輛。</p>
       </div>
     </div>
+    <details class="shot">
+      <summary><span>航班截圖</span><span class="chev" aria-hidden="true">▾</span></summary>
+      <img src="flights.jpg" width="1080" height="938" loading="lazy" decoding="async" alt="航班截圖：去程 10/13（二）02:00 桃園 TPE T1 起飛，05:30 抵達仁川 ICN T1；回程 10/17（六）23:00 仁川 ICN T1 起飛，10/18（日）00:35 抵達桃園 TPE T1">
+    </details>
   </section>
 
   <section id="days">
@@ -1190,7 +1206,7 @@
   else if (days.indexOf(h) >= 0) { cur.top = 'routes'; cur.day = h; }
   paint();
 })();
-</script><p class="buildinfo">版本 44255a7 · 更新於 10/11 03:41</p>
+</script><p class="buildinfo">版本 276e3b2 · 更新於 10/11 03:59</p>
 <style>
   .topbar-in.has-offl { grid-template-columns: 1fr 1fr auto; }
   .offl { font: inherit; font-size: 13px; font-weight: 600; line-height: 1.2; padding: 0 10px; border-radius: 10px;
