@@ -80,6 +80,60 @@ def chips(items):
 
 HOME = {'n': '梨大站 241', 's': '이대 · 住宿 · 1 號口'}
 
+# =============================================================== 每天的地點清單（路線頁與安全卡的「每日行程」共用這一份）
+# 改地點只改這裡：路線頁的 chip 與安全卡每天的 午餐／白天／吃喝／晚餐 列都從這份產生，兩邊不會再各改各的。
+# 營業時間、步行距離等說明仍寫在各天路線頁的 notes 裡（安全卡只列名字）。
+PLACES = {
+    'd1': {
+        'lunch': [('豬腳小姐 미쓰족발', gmap('미쓰족발 명동점 서울 중구 명동3길 21')),
+                  ('王妃家烤肉 왕비집 總店', gmap('왕비집 명동 본점 서울 중구 명동8가길 26'))],
+        'shops': [('樂天百貨本店', gmap('서울 중구 남대문로 81 롯데백화점 본점')), ('新世界百貨本店', gmap('서울 중구 소공로 63 신세계백화점 본점')),
+                  ('MLB（樂天 7 樓、新世界 5 樓）', U + 'jYVbCYTKA5ULYVoK9'), ('Nyunyu', U + 'h9xBKiUNi3y75kBo9'),
+                  ('8 seconds', U + 'u3pLv2hvKXbHjQtQ6'), ('8 seconds（明洞 8 街）', gcid(12288299774777914104)),
+                  ('Verish', U + 'oyFWvVWVwRLdRKUh8'), ('Ept', U + 'i9Gk6L6qNtoxhkUK9'),
+                  ('新世界免稅店 明洞店', gcid(10551342542703491581)), ('南大門市場', gcid(14787317685547704417))],
+        'dinner': [('無垢屋（安國站）', U + 'XyHGzLTpvwMFidDCA')],
+        'extra': [('益善洞韓屋村', gcid(10117955504964711899)), ('北村韓屋村', gcid(14824929312700491162)),
+                  ('倫敦貝果博物館 安國店', gcid(16799514592571927737)), ('솔솥 釜飯（益善洞）', gcid(10512087979443810332)),
+                  ('&meal 三明治（鐘閣）', gcid(11699278285228278577))],
+    },
+    'd2': {
+        'lunch': [('솔솥 釜飯', U + 'bBeP8iwVV3Q9sXoj7'), ('데이릿 DAYLIT 韓式融合', U + 'sd923JjcAAgWYvGKA'),
+                  ("Grandmother's Recipe 韓國菜", gcid(496188655814551911))],
+        'shops': [('自然島鹽麵包', U + 'R3Hcxf3a5gEijn6G8'), ('Stand oil', U + 'ouAPx7aC1JFmtcfm7'), ('Wacky willy', U + 'tMkUdDnRnLL5ENer7'),
+                  ('Tamburins', U + '95G1crrtgBN1NNnz6'), ('Double lover', U + '1huZgn8fiqcspLRm9'), ('North face white label', U + 'Wu689jQxZAEWQWEE8'),
+                  ('Human made', U + 'BJ9evkFt8McrFXb46'), ('Matin Kim', U + 'mXJjBfoqddtBuRTf6'), ('Satur', U + 'MShBWdqorQ8BnkHX7'),
+                  ('Satur House', gcid(7946203201946020237)), ('Atiissu', U + 'HkpCRh9Mpawhuz927')],
+        'dinner': [('祖傳三代馬鈴薯排骨湯（Naver）', 'https://naver.me/xD89xHu6')],     # 安全卡的晚餐列另有「診所結束後」的說明，手寫
+    },
+    'd3': {
+        'shops': [('廣藏市場', U + 'rWq4qu4DyfQMMnRy8'), ('Nyunyu（東大門）', U + 'S6QHsHDPZqyZeqp77'),
+                  ('apM（20:00）', U + 'KLETYgsoou98Fwer6'), ('apM Place', gcid(4968386951333458730)),
+                  ('東大門 Migliore', gcid(8229626887675014767)), ('DOOTA Mall', gcid(1834824361273245074)),
+                  ('東大門設計廣場 DDP', gcid(6639054745590107100)), ('新羅免稅店 首爾店', gcid(6861468877312938312))],
+        'dinner': [('陳玉華奶奶一隻雞', U + '9tRiASa1wYGg1jiK7'), ('Hook 烤肉（新堂）', gcid(3165162553768846670)),
+                   ('Dapeojwo 海鮮（祭基洞）', gcid(425737559644187818))],
+    },
+    'd4': {
+        'shops': [('KT&G', U + '2nXbebvkenrHS5se7'), ('時空間', U + 'GUqD6WZHUywsoXaq8'), ('Mucent', U + '2M1qfcHPgU1DTqw89'),
+                  ('As”on', U + 'wzd11pWh1uCnD36dA'), ('Musinsa standard', U + 'kGSh2iPvHD79v3Hy8'), ('Covernat', U + 'rsuzB4pZtDzEQirv7'),
+                  ('SPAO', U + 'MejExVR3345FBR8L7'), ('8 seconds', U + 'EeofHZG14xPNQB4z9'), ('Daiso', U + 'aXxCXWcR9SNiHv9o9'),
+                  ('AK plaza 二樓 with mu', U + 'Z8uqkKtWWFrxWdLj6'), ('MIXXO（弘大）', U + 'z6yQ1R6zEwA4fWaZ9'),
+                  ('Chaakan Shoes（弘大）', gcid(2331305143891035196)), ('Chaakan Shoes（延南）', gcid(3388213180839182877)),
+                  ('弘大商店街', gcid(14349369460367289050)), ('Daiso（合井一帶）', gcid(7598751900615994774))],
+        'food': [('豚壽百（豬肉湯飯）', gcid(8654896397275182277)), ('Shin Mi Kyung 辣炒雞', gcid(4425035991011461468)),
+                 ('匠人辣炒雞', gcid(13348765074285808277)), ('JO & DAWSON 咖啡', gcid(13213580688860194156)),
+                 ('JAMJAM 早午餐', gcid(6568848292499483586)), ('1.5floor 咖啡', gcid(4920152743334876284))],
+        'dinner': [('git tteul', U + 'MRquskwWVFFVvDfZ7')],
+    },
+}
+
+
+def dn(items):
+    """路線頁把晚餐也放進 chip 列，標「晚餐：」"""
+    return [('晚餐：' + n, u) for n, u in items]
+
+
 # =============================================================== D1
 d1a_nodes = [
     {'n': '仁川機場 T1', 's': '인천공항 1터미널'},
@@ -127,6 +181,7 @@ d1c_segs = [
 d1c_svg = strip(d1c_nodes, d1c_segs, {}, 'D1 晚上：明洞到安國站吃晚餐，再回梨大住宿的路線')
 
 d1 = '<div class="panel-body">' + head('D1', '10/13（二）· 抵達日', '機場 → 明洞 → 安國 → 住宿') + \
+    notes(['凌晨 05:30 落地，百貨 10:30 才開門：早上先去機場汗蒸幕，再出發（見安全卡 D1）。']) + \
     card(d1a_svg, '去明洞 路線 1：機場 → 梨大（放行李）→ 樂天') + \
     notes([
         '搭「一般列車」才停弘大入口，直通列車不停。',
@@ -135,28 +190,20 @@ d1 = '<div class="panel-body">' + head('D1', '10/13（二）· 抵達日', '機�
     card(d1b_svg, '路線 2（不放行李）：機場 → 首爾站 → 明洞', False) + \
     notes(['直通列車直達首爾站，轉 4 號線要走一段，帶行李較累。']) + \
     '<h3 class="h3">午餐：二選一</h3>' + \
-    chips([('豬腳小姐 미쓰족발', gmap('미쓰족발 명동점 서울 중구 명동3길 21')),
-           ('王妃家烤肉 왕비집 總店', gmap('왕비집 명동 본점 서울 중구 명동8가길 26'))]) + \
+    chips(PLACES['d1']['lunch']) + \
     notes([
         '豬腳小姐 <span class="ko">미쓰족발 명동점</span>：乙支路入口站 5／6 號口步行約 3–5 分（估）。每天 11:00–02:00。',
         '王妃家烤肉 <span class="ko">왕비집 본점</span>（2 樓）：明洞站約 400 m（直線）。每天 11:30–22:00，最後點餐 21:15。',
         '營業時間查自韓國餐廳網站與部落格，出發前以 Google 地圖當天顯示為準。',
     ]) + \
     '<h3 class="h3">明洞可以逛的店</h3>' + \
-    chips([('樂天百貨本店', gmap('서울 중구 남대문로 81 롯데백화점 본점')), ('新世界百貨本店', gmap('서울 중구 소공로 63 신세계백화점 본점')),
-           ('MLB（樂天 7 樓、新世界 5 樓）', U + 'jYVbCYTKA5ULYVoK9'), ('Nyunyu', U + 'h9xBKiUNi3y75kBo9'),
-           ('8 seconds', U + 'u3pLv2hvKXbHjQtQ6'), ('8 seconds（明洞 8 街）', gcid(12288299774777914104)),
-           ('Verish', U + 'oyFWvVWVwRLdRKUh8'), ('Ept', U + 'i9Gk6L6qNtoxhkUK9'),
-           ('新世界免稅店 明洞店', gcid(10551342542703491581)), ('南大門市場', gcid(14787317685547704417)),
-           ('晚餐：無垢屋（安國站）', U + 'XyHGzLTpvwMFidDCA')]) + \
+    chips(PLACES['d1']['shops'] + dn(PLACES['d1']['dinner'])) + \
     notes(['免稅店購物要帶護照和回程機票資料。']) + \
     '<h3 class="h3">晚上：安國站晚餐 → 回梨大</h3>' + \
     card(d1c_svg, '樂天旁 → 安國站 → 梨大', False) + \
     notes(['從明洞站去安國站：4 號線北上到忠武路，換 3 號線往大化。']) + \
     '<h3 class="h3">安國一帶可以去的點</h3>' + \
-    chips([('益善洞韓屋村', gcid(10117955504964711899)), ('北村韓屋村', gcid(14824929312700491162)),
-           ('倫敦貝果博物館 安國店', gcid(16799514592571927737)), ('솔솥 釜飯（益善洞）', gcid(10512087979443810332)),
-           ('&meal 三明治（鐘閣）', gcid(11699278285228278577))]) + \
+    chips(PLACES['d1']['extra']) + \
     notes([
         '倫敦貝果博物館 <span class="ko">런던 베이글 뮤지엄</span> 安國店：每天 07:00–18:00，晚餐時段已打烊。',
         '솔솥 釜飯（益善洞）：每天 11:00–21:00，也可當晚餐選項。',
@@ -185,10 +232,9 @@ d2_segs = [
 d2_svg = strip(d2_nodes, d2_segs, {}, 'D2 梨大到聖水、新沙，再回聖水吃晚餐後回住宿的路線')
 
 d2 = '<div class="panel-body">' + head('D2', '10/14（三）· 白天聖水，傍晚新沙', '聖水 → 新沙 → 聖水') + \
-    card(d2_svg, '梨大 → 聖水 → 新沙（18:30）→ 聖水晚餐 → 梨大') + \
+    card(d2_svg, '梨大 → 聖水 → 新沙（18:30）→ 聖水晚餐 → 梨大（新沙之後，術後那晚改叫車）') + \
     '<h3 class="h3">午餐：三選一</h3>' + \
-    chips([('솔솥 釜飯', U + 'bBeP8iwVV3Q9sXoj7'), ('데이릿 DAYLIT 韓式融合', U + 'sd923JjcAAgWYvGKA'),
-           ("Grandmother's Recipe 韓國菜", gcid(496188655814551911))]) + \
+    chips(PLACES['d2']['lunch']) + \
     notes([
         '솔솥 釜飯 <span class="ko">솔솥 성수점</span>：聖水站 3 號口步行約 5 分。11:30–21:00，最後點餐 20:20；平日午餐最後點餐 14:20，之後休息。',
         '데이릿 <span class="ko">DAYLIT</span>（B1）：纛島站 <span class="ko">뚝섬</span>（聖水前一站）步行約 3–5 分。11:30–21:30，最後點餐 20:30；平日 14:30–17:00 休息。',
@@ -196,15 +242,12 @@ d2 = '<div class="panel-body">' + head('D2', '10/14（三）· 白天聖水，�
         '10/14 是週三，솔솥、데이릿下午休息，午餐請在 14:00 前到。솔솥和 데이릿的時間查自韓國餐廳網站與部落格，出發前以 Google 地圖當天顯示為準。',
     ]) + \
     '<h3 class="h3">聖水可以逛的店</h3>' + \
-    chips([('自然島鹽麵包', U + 'R3Hcxf3a5gEijn6G8'), ('Stand oil', U + 'ouAPx7aC1JFmtcfm7'), ('Wacky willy', U + 'tMkUdDnRnLL5ENer7'),
-           ('Tamburins', U + '95G1crrtgBN1NNnz6'), ('Double lover', U + '1huZgn8fiqcspLRm9'), ('North face white label', U + 'Wu689jQxZAEWQWEE8'),
-           ('Human made', U + 'BJ9evkFt8McrFXb46'), ('Matin Kim', U + 'mXJjBfoqddtBuRTf6'), ('Satur', U + 'MShBWdqorQ8BnkHX7'),
-           ('Satur House', gcid(7946203201946020237)), ('Atiissu', U + 'HkpCRh9Mpawhuz927')]) + \
+    chips(PLACES['d2']['shops']) + \
     '<h3 class="h3">傍晚與晚上</h3>' + \
-    chips([('18:30 新沙站 3 號口', U + 'qEQWciBaK3x2ujDh6'), ('晚餐：祖傳三代馬鈴薯排骨湯（Naver）', 'https://naver.me/xD89xHu6')]) + \
+    chips([('18:30 新沙站 3 號口', U + 'qEQWciBaK3x2ujDh6')] + dn(PLACES['d2']['dinner'])) + \
     notes([
         '排骨湯店 <span class="ko">소문난 성수 감자탕</span>：聖水站 4 號口外約 240 m，24 小時營業。',
-        '術後那晚（見安全卡 D2）：回梨大叫 Kakao T，上車前把車牌傳給家人。地圖上的地鐵路線是備案。',
+        '術後那晚不搭地鐵（見安全卡 D2）：離開診所後直接叫 Kakao T，去聖水吃晚餐、再回梨大都叫車，上車前把車牌傳給家人。圖上新沙之後的地鐵路線只是平常的走法。',
     ], 'note warn') + '</div>'
 
 # =============================================================== D3
@@ -224,12 +267,7 @@ d3_svg = strip(d3_nodes, d3_segs, {}, 'D3 梨大到東大門一帶再回住宿�
 d3 = '<div class="panel-body">' + head('D3', '10/15（四）· 光藏、東大門', '東大門一帶') + \
     card(d3_svg, '梨大 → 乙支路4街 → 東大門歷史文化公園 → 梨大') + \
     '<h3 class="h3">東大門可以逛的店</h3>' + \
-    chips([('廣藏市場', U + 'rWq4qu4DyfQMMnRy8'), ('Nyunyu（東大門）', U + 'S6QHsHDPZqyZeqp77'),
-           ('apM（20:00）', U + 'KLETYgsoou98Fwer6'), ('apM Place', gcid(4968386951333458730)),
-           ('東大門 Migliore', gcid(8229626887675014767)), ('DOOTA Mall', gcid(1834824361273245074)),
-           ('東大門設計廣場 DDP', gcid(6639054745590107100)), ('新羅免稅店 首爾店', gcid(6861468877312938312)),
-           ('晚餐：陳玉華奶奶一隻雞', U + '9tRiASa1wYGg1jiK7'), ('晚餐：Hook 烤肉（新堂）', gcid(3165162553768846670)),
-           ('晚餐：Dapeojwo 海鮮（祭基洞）', gcid(425737559644187818))]) + \
+    chips(PLACES['d3']['shops'] + dn(PLACES['d3']['dinner'])) + \
     notes([
         '新羅免稅店在東國大學一帶，離東大門歷史文化公園約 1 km（直線）；免稅店要帶護照和回程機票資料。',
         'Hook 烤肉：新堂站（東大門歷史文化公園的下一站）附近。Google 地圖沒有營業時間，出發前先問店家。',
@@ -254,17 +292,9 @@ d4_svg = strip(d4_nodes, d4_segs, {}, 'D4 梨大到弘大再從合井回住宿�
 d4 = '<div class="panel-body">' + head('D4', '10/16（五）· 弘大', '弘大 → 合井') + \
     card(d4_svg, '梨大 → 弘益大學 → 合井 → 梨大') + \
     '<h3 class="h3">弘大可以逛的店</h3>' + \
-    chips([('KT&G', U + '2nXbebvkenrHS5se7'), ('時空間', U + 'GUqD6WZHUywsoXaq8'), ('Mucent', U + '2M1qfcHPgU1DTqw89'),
-           ('As”on', U + 'wzd11pWh1uCnD36dA'), ('Musinsa standard', U + 'kGSh2iPvHD79v3Hy8'), ('Covernat', U + 'rsuzB4pZtDzEQirv7'),
-           ('SPAO', U + 'MejExVR3345FBR8L7'), ('8 seconds', U + 'EeofHZG14xPNQB4z9'), ('Daiso', U + 'aXxCXWcR9SNiHv9o9'),
-           ('AK plaza 二樓 with mu', U + 'Z8uqkKtWWFrxWdLj6'), ('MIXXO（弘大）', U + 'z6yQ1R6zEwA4fWaZ9'),
-           ('Chaakan Shoes（弘大）', gcid(2331305143891035196)), ('Chaakan Shoes（延南）', gcid(3388213180839182877)),
-           ('弘大商店街', gcid(14349369460367289050)), ('Daiso（合井一帶）', gcid(7598751900615994774)),
-           ('晚餐：git tteul', U + 'MRquskwWVFFVvDfZ7')]) + \
+    chips(PLACES['d4']['shops'] + dn(PLACES['d4']['dinner'])) + \
     '<h3 class="h3">吃的與咖啡</h3>' + \
-    chips([('豚壽百（豬肉湯飯）', gcid(8654896397275182277)), ('Shin Mi Kyung 辣炒雞', gcid(4425035991011461468)),
-           ('匠人辣炒雞', gcid(13348765074285808277)), ('JO & DAWSON 咖啡', gcid(13213580688860194156)),
-           ('JAMJAM 早午餐', gcid(6568848292499483586)), ('1.5floor 咖啡', gcid(4920152743334876284))]) + \
+    chips(PLACES['d4']['food']) + \
     notes([
         '豚壽百 弘大直營店（豬肉湯飯）：24 小時營業。',
         'Shin Mi Kyung 辣炒雞：每天 11:00–22:30。',
@@ -283,7 +313,8 @@ d4 = '<div class="panel-body">' + head('D4', '10/16（五）· 弘大', '弘大 
 d5 = ('<div class="panel-body"><header class="dayhead"><span class="day-no off">D5</span><div><h2>返程日</h2>'
       '<p class="section-note">10/17（六）</p></div></header>'
       '<p class="sum">行程還沒訂。固定：12:00 退房、23:00 仁川機場 T1 起飛。</p>'
-      + notes(['去機場：梨大站搭 2 號線外環到弘大入口，換機場鐵路一般列車，T1 下車。'], 'note') + '</div>')
+      + notes(['退房後到出發前有 7 到 8 小時，先問公寓能不能寄放行李。建議 ~18:00 離開市區、~19:30 抵達仁川 T1，留時間退稅與託運（見安全卡 D5）。',
+               '去機場：梨大站搭 2 號線外環到弘大入口，換機場鐵路一般列車，T1 下車。'], 'note') + '</div>')
 
 # =============================================================== overview
 legs = '''<section id="legs"><h2>每天怎麼走</h2>
@@ -291,7 +322,7 @@ legs = '''<section id="legs"><h2>每天怎麼走</h2>
 <div class="legs"><table>
 <thead><tr><th>日</th><th>去程</th><th>回程</th></tr></thead>
 <tbody>
-<tr><td class="d">D1</td><td>機場 → 梨大（放行李）→ 明洞</td><td>安國站 328（3 號線）→ 乙支路3街換 2 號線外環 → 梨大</td></tr>
+<tr><td class="d">D1</td><td>機場（先去汗蒸幕）→ 梨大（放行李）→ 明洞</td><td>安國站 328（3 號線）→ 乙支路3街換 2 號線外環 → 梨大</td></tr>
 <tr><td class="d">D2</td><td>梨大 → 聖水 211 5 號口<br>2 號線內環<br>傍晚：新沙 337 3 號口</td><td>聖水 211 4 號口<br>2 號線外環</td></tr>
 <tr><td class="d">D3</td><td>梨大 → 乙支路4街 204 4 號口<br>2 號線內環</td><td>東大門歷史文化公園 205 2 號口<br>2 號線外環</td></tr>
 <tr><td class="d">D4</td><td>梨大 → 弘益大學 239 4 號口<br>2 號線外環</td><td>合井 238 3 號口<br>2 號線內環</td></tr>
@@ -471,13 +502,37 @@ for _id in ['emergency', 'flights', 'days', 'safety', 'checklist']:
     sub('<a href="#%s">' % _id, '<a href="#%s" data-goto="%s">' % (_id, _id))
 sub('Ever8 Serviced Residence（新村）', 'Ever8 Serviced Residence（梨大站旁）')
 sub('首爾地鐵 2 號線新村站，步行約 10 分鐘內 · 每晚入住', '首爾地鐵 2 號線梨大站（241）1 號口，步行約 314 m（Naver Map） · 每晚入住')
-sub('<span class="chip">MIXXO</span>', '')
-sub('自然道鹽麵包', '自然島鹽麵包')
 sub('回新村一律叫 Kakao T', '回梨大住處一律叫 Kakao T')
 sub('<dd>祖傳三代馬鈴薯排骨湯</dd>', '<dd>祖傳三代馬鈴薯排骨湯（聖水站旁，診所結束後）</dd>')
-sub('<span class="chip">新羅免稅店</span>', '')
 sub('弘大到新村只有一小段', '弘大到梨大只有一小段')
 sub('新沙站 3 號口（閨蜜雙眼皮手術）', '新沙站 3 號口（雙眼皮手術）')
+sub('<dd>APM</dd>', '<dd>apM</dd>')
+
+
+def _srow(label, items):
+    """安全卡一列：左邊標籤，右邊一排 chip（只列名字；連結與營業時間在路線頁）"""
+    chips_html = ''.join('<span class="chip">%s</span>' % esc(re.sub(r'（Naver）$', '', n)) for n, _ in items)
+    return '<div class="row"><dt>%s</dt><dd><div class="chips">%s</div></dd></div>' % (label, chips_html)
+
+
+def _swap_row(day_no, dt, new_rows):
+    """把安全卡 D{n} 那張卡裡標籤為 dt 的那一列，換成 new_rows"""
+    global s_body
+    a = s_body.index('<span class="day-no">%s</span>' % day_no)
+    b = s_body.index('</dl>', a)
+    seg = s_body[a:b]
+    pat = re.compile(r'<div class="row"><dt>%s</dt>.*?</dd></div>' % re.escape(dt), re.S)
+    assert len(pat.findall(seg)) == 1, (day_no, dt)
+    s_body = s_body[:a] + pat.sub(lambda m: new_rows, seg) + s_body[b:]
+
+
+_swap_row('D1', '白天', _srow('午餐', PLACES['d1']['lunch']) + _srow('白天', PLACES['d1']['shops']))
+_swap_row('D1', '晚餐', _srow('晚餐', PLACES['d1']['dinner']) + _srow('安國一帶', PLACES['d1']['extra']))
+_swap_row('D2', '白天', _srow('午餐', PLACES['d2']['lunch']) + _srow('白天', PLACES['d2']['shops']))
+_swap_row('D3', '白天', _srow('白天', PLACES['d3']['shops']))
+_swap_row('D3', '晚餐', _srow('晚餐', PLACES['d3']['dinner']))
+_swap_row('D4', '白天', _srow('白天', PLACES['d4']['shops']) + _srow('吃喝', PLACES['d4']['food']))
+_swap_row('D4', '晚餐', _srow('晚餐', PLACES['d4']['dinner']))
 DOCS = """<h3 class="group-title">證件與護照</h3>
     <div class="card">
       <ul class="checks">

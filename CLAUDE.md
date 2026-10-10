@@ -13,7 +13,7 @@
 1. **取得推送權限**：`add_repo(owner="wangty318", repo="seoul-wh1317", access="push")`，照回傳指示 clone 後 `register_repo_root`。前提有兩個：使用者已在 claude.ai 連結 GitHub，且已在他的 GitHub 帳號安裝 Claude GitHub App 並授權這個 repo（https://github.com/apps/claude/installations/select_target）。若回傳 `push_check: refused`，代表第二項還沒做，推送會被拒絕，請使用者先完成。
 2. **改來源**（見「來源在哪」）。**不要手改**根目錄的 `index.html`（導向頁）與整個 `seoul-pwa/`（`index.html`、`sw.js`、`manifest.webmanifest`、`version.json`、`icons/`、`seoul-metro-map.jpg`），它們都是 build 產物。
 3. **重建**：`python3 src/build.py`（輸出到 `seoul-pwa/` 並更新根目錄導向頁；內容沒變時輸出完全相同，不會產生多餘的 git 變更）。
-4. **測試**：`NODE_PATH=$(npm root -g) node tests/pwa_test.js`（27 項）、`NODE_PATH=$(npm root -g) node tests/layout_test.js`（8 項，兩個網址都能開）與 `NODE_PATH=$(npm root -g) node tests/vault_test.js`（27 項，入境卡按鈕；用現場畫的假圖，不碰真卡），必須全過。再用 Playwright 手機尺寸（390×844）截圖看改到的畫面。
+4. **測試**：`NODE_PATH=$(npm root -g) node tests/pwa_test.js`（27 項）、`NODE_PATH=$(npm root -g) node tests/layout_test.js`（8 項，兩個網址都能開）、`NODE_PATH=$(npm root -g) node tests/vault_test.js`（27 項，入境卡按鈕；用現場畫的假圖，不碰真卡）與 `python3 tests/sync_test.py`（22 項，安全卡與路線兩個分頁的地點、日期、固定資訊要一致），必須全過。再用 Playwright 手機尺寸（390×844）截圖看改到的畫面。
 5. **提交並推到 `main`**，commit 訊息用中文簡述改了什麼，結尾附上 session 規定的 attribution。
 6. **確認上線**：等 1–3 分鐘，WebFetch `https://wangty318.github.io/seoul-wh1317/seoul-pwa/version.json`，其中 `build` 要和本機 `seoul-pwa/version.json` 一致。
 7. **回報使用者**：改了什麼（白話）、版本號與更新時間、她們怎麼拿到（見下）。
@@ -28,6 +28,7 @@
 ## 來源在哪（全在 `src/`）
 | 要改什麼 | 去哪改 |
 |---|---|
+| **每天的地點 chip**（午餐／逛的店／吃喝咖啡／晚餐／安國一帶） | `gen_site.py` 的 `PLACES`（**路線頁與安全卡的「每日行程」共用這一份**，改這裡兩邊一起變；安全卡那幾列由 `_srow`／`_swap_row` 產生，不要去手改 `seoul-safety.html` 裡的 chip）。營業時間與步行距離的說明仍寫在各天的 `notes([...])`（只在路線頁） |
 | 路線 D1–D5、總覽、怎麼認方向 | `gen_site.py`：`# ===== D1` … `# ===== overview` 各區塊（`dN_nodes` 是站點，`dN` 是整頁） |
 | 安全卡內容 | `seoul-safety.html`（原始），加上 `gen_site.py` 的 `sub(舊字串, 新字串)` 替換與 `DOCS`（證件與護照清單） |
 | 「Hsuan的入境卡」按鈕與密碼視窗 | 按鈕與視窗標記在 `gen_site.py` 的 `VAULT_BTN`／`VAULT_SHADOW_CSS`／`VAULT_DLG`；行為在 `vault.js`、視窗樣式在 `vault.css`（都由 gen_site.py 內嵌，不經 make_pwa.py） |
@@ -40,7 +41,7 @@
 `gen_site.py` 是層層補丁出來的，改動時先用 `grep` 找到要改的字串，一次只改一處，改完 build 並看輸出。
 
 ### 加地點與營業時間的慣例
-- 使用者的 Google 地圖清單「首爾」（63 點，2026-10-11 讀過）是「想去的點」來源。清單連結不要放進 repo。新增的點用 `gcid(cid)`（`https://www.google.com/maps?cid=…`，cid 要轉成無號整數），不必短網址。
+- 使用者的 Google 地圖清單「首爾」（63 點，2026-10-11 讀過）是「想去的點」來源。清單連結不要放進 repo。新增的點加進 `PLACES` 對應那天，用 `gcid(cid)`（`https://www.google.com/maps?cid=…`，cid 要轉成無號整數），不必短網址。
 - 店家、百貨只放連結；餐廳與咖啡廳另加營業時間，並註明來源與查詢日期。營業時間優先讀 Google 地圖頁面（內建瀏覽器開 cid 連結，表格在 DOM 裡；有的要先點「查看更詳細的營業時間」），Google 沒資料才查 다이닝코드或部落格，且要寫明「Google 地圖沒有營業時間」。
 - 午餐選項放在各天的「午餐」區塊，要提醒當天是星期幾與平日下午休息。
 
@@ -60,8 +61,12 @@
 - 同一個網址在 Safari 分頁與「加入主畫面」的 App 是兩份獨立儲存空間（勾選與填寫的緊急電話不互通）。
 - **站點固定放在 `seoul-pwa/`，不要搬到根目錄或改資料夾名稱**：連結已經傳給她們，已安裝的主畫面圖示綁定的是安裝當下的網址，搬了她們就收不到更新。根目錄的 `index.html` 只是導向頁。
 
+## 兩個分頁要保持一致
+- 安全卡與路線兩個分頁有重複的內容（每天的地點、D1 汗蒸幕、D2 術後叫車、D5 寄放行李與建議時間、住宿與航班時間）。改一邊就要看另一邊要不要跟著改，改完跑 `tests/sync_test.py`。
+- 地點已經共用 `PLACES`；其餘的句子（上面列的那幾項）是兩邊各寫一份，沒有自動同步，改的時候兩邊都要看。
+
 ## 待使用者決定（截至 2026-10-11）
-- D2 術後那晚 新沙 → 聖水 / 梨大 怎麼走：安全卡寫「一律叫 Kakao T」，路線頁把地鐵畫成備案，兩邊尚未統一。外國遊客能否註冊 Kakao T 各來源說法不一，建議寫成「Kakao T / k.ride / Uber 擇一，出發前先註冊並綁卡」。
+- D2 術後那晚 新沙 → 聖水 / 梨大 怎麼走：10/11 起兩頁都寫「叫 Kakao T、不搭地鐵」（路線頁原本把地鐵寫成備案，已對齊安全卡較嚴的說法）。是否要保留地鐵備案、外國遊客能否註冊 Kakao T（各來源說法不一）仍待決定，建議寫成「Kakao T / k.ride / Uber 擇一，出發前先註冊並綁卡」。
 - D5 返程日行程（12:00 退房、23:00 班機）。
 - apM 20:00 是入場時間還是約會時間。
 - iPhone 的 Apple Wallet T-money 只收 Mastercard / AmEx / 銀聯（Visa 不行，資料到 2026/4）；用 Visa 的人要買實體 T-money 卡。
