@@ -1,0 +1,38 @@
+
+  /* ===== Hsuan的入境卡：全螢幕覆蓋層（按鈕本身在安全卡的 shadow DOM 裡，樣式見 gen_site.py 的 VAULT_SHADOW_CSS） ===== */
+  html.vault-on { overflow: hidden; }
+  .vault-ov { position: fixed; top: 0; right: 0; bottom: 0; left: 0; z-index: 100; display: flex; flex-direction: column;
+    box-sizing: border-box; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px);
+    background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 15px; line-height: 1.6; }
+  .vault-bar { flex: none; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 16px; border-bottom: 1px solid var(--line); }
+  .vault-bar h2 { margin: 0; font-size: 17px; line-height: 1.3; min-width: 0; overflow-wrap: anywhere; }
+  .vault-x, .vault-btn { font: inherit; font-size: 15px; font-weight: 700; min-height: 44px; padding: 0 16px; box-sizing: border-box; border-radius: 10px;
+    border: 1px solid var(--line); background: var(--surface); color: var(--fg); cursor: pointer; }
+  .vault-btn.main { border-color: var(--accent); background: var(--accent); color: var(--on-accent); }
+  .vault-btn[data-armed] { border-color: var(--alert); background: var(--alert-bg); color: var(--alert); }
+  .vault-body { flex: 1; min-height: 0; display: flex; flex-direction: column; overflow: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+  .vault-pane { box-sizing: border-box; width: 100%; max-width: 420px; margin: 0 auto; padding: 32px 16px; display: grid; gap: 14px; }
+  .vault-pane[hidden] { display: none; }
+  .vault-pane h3 { margin: 0; font-size: 17px; line-height: 1.4; }
+  .vault-pane p { margin: 0; }
+  .vault-pane label { font-weight: 700; }
+  .vault-hint { font-size: 13px; color: var(--muted); }
+  .vault-msg { min-height: 1.6em; font-size: 14px; color: var(--alert); }
+  #vault-imp-msg, #vault-view-msg { color: var(--muted); }
+  .vault-pin { font: inherit; font-family: var(--font-mono); font-size: 30px; line-height: 1.2; letter-spacing: .5em; text-indent: .5em; text-align: center;
+    box-sizing: border-box; width: 100%; min-height: 56px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); color: var(--fg);
+    -webkit-text-security: disc; text-security: disc; }
+  .vault-pin:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .vault-shake { animation: vault-shake .3s; }
+  @keyframes vault-shake { 20% { transform: translateX(-8px); } 40% { transform: translateX(8px); } 60% { transform: translateX(-5px); } 80% { transform: translateX(5px); } }
+  @media (prefers-reduced-motion: reduce) { .vault-shake { animation: none; } }
+  .vault-file { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; pointer-events: none; }
+  .vault-view { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+  .vault-view[hidden] { display: none; }
+  .vault-stage { flex: 1; min-height: 0; overflow: auto; background: #fff; }
+  .vault-stage img { display: block; width: 100%; max-width: 720px; height: auto; margin: 0 auto; }
+  .vault-stage iframe { display: block; width: 100%; height: 100%; min-height: 60vh; border: 0; background: #fff; }
+  .vault-foot { flex: none; display: grid; gap: 8px; padding: 10px 16px; border-top: 1px solid var(--line); background: var(--bg); }
+  .vault-foot .row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .vault-foot p { margin: 0; font-size: 13px; line-height: 1.5; color: var(--muted); }
+  .vault-foot a { color: var(--accent); }

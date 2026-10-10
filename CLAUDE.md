@@ -6,14 +6,14 @@
 - 5 天首爾自由行（10/13–10/17）的手機網頁，給使用者（汪泰右）的女友與她的閨蜜用，兩人都用 **iPhone**，住 Ever8 Serviced Residence（梨大站旁）。
 - 兩個大分頁：**安全卡**（預設）與**路線**（D1–D5 + 總覽 + 地鐵圖）。可「加入主畫面」離線使用。
 - 線上網址（正式）：https://wangty318.github.io/seoul-wh1317/seoul-pwa/ （GitHub Pages，`main` / `/(root)`）。短網址 https://wangty318.github.io/seoul-wh1317/ 只是導向頁，會自動跳到正式網址。**使用者已把連結傳給她們**，兩個網址都必須持續可用。
-- **公開 repo**：不要放護照號碼、電話、訂房編號。緊急電話與勾選狀態由她們在手機上自己填（localStorage），不進 repo。
+- **公開 repo**：不要放護照號碼、電話、訂房編號，**也不要放入境卡（見「Hsuan的入境卡」）**。緊急電話與勾選狀態由她們在手機上自己填（localStorage），不進 repo。
 - 使用者偏好：繁體中文、簡潔直接、客觀不一味附和。行程不要時間／班次細節（她們自己動態查），每日路線只畫到商圈，文字要少、現場好讀。
 
 ## 更新流程
 1. **取得推送權限**：`add_repo(owner="wangty318", repo="seoul-wh1317", access="push")`，照回傳指示 clone 後 `register_repo_root`。前提有兩個：使用者已在 claude.ai 連結 GitHub，且已在他的 GitHub 帳號安裝 Claude GitHub App 並授權這個 repo（https://github.com/apps/claude/installations/select_target）。若回傳 `push_check: refused`，代表第二項還沒做，推送會被拒絕，請使用者先完成。
 2. **改來源**（見「來源在哪」）。**不要手改**根目錄的 `index.html`（導向頁）與整個 `seoul-pwa/`（`index.html`、`sw.js`、`manifest.webmanifest`、`version.json`、`icons/`、`seoul-metro-map.jpg`），它們都是 build 產物。
 3. **重建**：`python3 src/build.py`（輸出到 `seoul-pwa/` 並更新根目錄導向頁；內容沒變時輸出完全相同，不會產生多餘的 git 變更）。
-4. **測試**：`NODE_PATH=$(npm root -g) node tests/pwa_test.js`（27 項）與 `NODE_PATH=$(npm root -g) node tests/layout_test.js`（8 項，兩個網址都能開），必須全過。再用 Playwright 手機尺寸（390×844）截圖看改到的畫面。
+4. **測試**：`NODE_PATH=$(npm root -g) node tests/pwa_test.js`（27 項）、`NODE_PATH=$(npm root -g) node tests/layout_test.js`（8 項，兩個網址都能開）與 `NODE_PATH=$(npm root -g) node tests/vault_test.js`（27 項，入境卡按鈕；用現場畫的假圖，不碰真卡），必須全過。再用 Playwright 手機尺寸（390×844）截圖看改到的畫面。
 5. **提交並推到 `main`**，commit 訊息用中文簡述改了什麼，結尾附上 session 規定的 attribution。
 6. **確認上線**：等 1–3 分鐘，WebFetch `https://wangty318.github.io/seoul-wh1317/seoul-pwa/version.json`，其中 `build` 要和本機 `seoul-pwa/version.json` 一致。
 7. **回報使用者**：改了什麼（白話）、版本號與更新時間、她們怎麼拿到（見下）。
@@ -30,6 +30,7 @@
 |---|---|
 | 路線 D1–D5、總覽、怎麼認方向 | `gen_site.py`：`# ===== D1` … `# ===== overview` 各區塊（`dN_nodes` 是站點，`dN` 是整頁） |
 | 安全卡內容 | `seoul-safety.html`（原始），加上 `gen_site.py` 的 `sub(舊字串, 新字串)` 替換與 `DOCS`（證件與護照清單） |
+| 「Hsuan的入境卡」按鈕與密碼視窗 | 按鈕與視窗標記在 `gen_site.py` 的 `VAULT_BTN`／`VAULT_SHADOW_CSS`／`VAULT_DLG`；行為在 `vault.js`、視窗樣式在 `vault.css`（都由 gen_site.py 內嵌，不經 make_pwa.py） |
 | 地鐵圖按鈕與縮放全螢幕 | `gen_site.py` 的 `MAPBLOCK`；圖檔 `seoul-metro-map.jpg`（全尺寸）、`metro-thumb.jpg`（縮圖，內嵌進頁面） |
 | 兩個大分頁與 hash 路由 | `gen_site.py` 的 `TOP_OPEN`、`TOPSCRIPT`、`EXTRA3` |
 | 共用的卡片／路線圖繪製函式 | `gen_v3_backup.py` 前半（`strip`、`card`、`head`…；只被 `exec` 前半段，後面是被改寫的舊外殼）；`seoul-routes-v2.html` 提供舊版 CSS |
@@ -42,6 +43,14 @@
 - 使用者的 Google 地圖清單「首爾」（63 點，2026-10-11 讀過）是「想去的點」來源。清單連結不要放進 repo。新增的點用 `gcid(cid)`（`https://www.google.com/maps?cid=…`，cid 要轉成無號整數），不必短網址。
 - 店家、百貨只放連結；餐廳與咖啡廳另加營業時間，並註明來源與查詢日期。營業時間優先讀 Google 地圖頁面（內建瀏覽器開 cid 連結，表格在 DOM 裡；有的要先點「查看更詳細的營業時間」），Google 沒資料才查 다이닝코드或部落格，且要寫明「Google 地圖沒有營業時間」。
 - 午餐選項放在各天的「午餐」區塊，要提醒當天是星期幾與平日下午休息。
+
+## Hsuan的入境卡（安全卡最下面的按鈕，密碼 0517）
+- 使用者要求：按鈕在安全卡最底，輸入 0517 才能看 Hsuan 的韓國入境電子申報（`Korea_e-Arrivalcard_*.pdf`）。
+- **入境卡不進 repo，也不進建置產物**：repo 是公開的，卡上是個人證件資料；網頁上的 4 位數密碼擋不住任何人（程式碼公開，下載檔案就能離線暴力破解），git 歷史也刪不乾淨。`tests/vault_test.js` 的第 26、27 項會檢查 repo 沒有 PDF／arrival 檔、建置後的網站沒有內嵌 PDF 也沒有明文密碼。
+- 做法：Hsuan 在**自己的手機**第一次打開按鈕、輸入密碼後「選擇檔案」匯入（截圖最穩，PDF 也收，上限 15 MB），檔案只存在那支手機的 IndexedDB（`seoul-vault`），不上傳。之後輸入密碼就直接看；「換一張」「刪除（按兩次）」在同一個畫面。
+- 密碼只是畫面上的鎖（擋旁人瞄到），不是加密；程式裡只存雜湊值、沒有明文，但 4 位數本來就能暴力破解。切到別的 App 或鎖屏會自動關閉並回到密碼畫面。
+- 儲存是每個安裝各自一份：Safari 分頁與主畫面 App 不互通；Safari 分頁（沒加入主畫面）若很多天沒開，iOS 可能清掉網站資料，所以請她把截圖或 PDF 另外留在相簿／檔案 App 當備份。沒在 iPhone 實機測過，尤其 PDF 在 iOS 內嵌顯示（有「用瀏覽器開啟」備案）。
+- 之後有人要「把入境卡直接放進網頁」：先跟使用者講清楚上面的風險再決定，不要默默 commit 檔案。
 
 ## 不要踩的地方
 - `sw.template.js` 裡頁面請求的 `cache: 'no-cache'` **不能拿掉**；測試有負向對照（拿掉後 4 項會失敗）。
