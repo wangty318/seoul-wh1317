@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>首爾自由行手冊</title>
-<meta name="build-id" content="71fb7f056920">
+<meta name="build-id" content="44255a72e7a8">
 <meta name="robots" content="noindex,nofollow">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/icon-192.png">
@@ -300,44 +300,6 @@
   #pane-safety { display: block; }
   .tabs { top: calc(env(safe-area-inset-top, 0px) + var(--topbar-h)); }
 
-  /* ===== Hsuan的入境卡：全螢幕覆蓋層（按鈕本身在安全卡的 shadow DOM 裡，樣式見 gen_site.py 的 VAULT_SHADOW_CSS） ===== */
-  html.vault-on { overflow: hidden; }
-  .vault-ov { position: fixed; top: 0; right: 0; bottom: 0; left: 0; z-index: 100; display: flex; flex-direction: column;
-    box-sizing: border-box; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px);
-    background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 15px; line-height: 1.6; }
-  .vault-bar { flex: none; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 16px; border-bottom: 1px solid var(--line); }
-  .vault-bar h2 { margin: 0; font-size: 17px; line-height: 1.3; min-width: 0; overflow-wrap: anywhere; }
-  .vault-x, .vault-btn { font: inherit; font-size: 15px; font-weight: 700; min-height: 44px; padding: 0 16px; box-sizing: border-box; border-radius: 10px;
-    border: 1px solid var(--line); background: var(--surface); color: var(--fg); cursor: pointer; }
-  .vault-btn.main { border-color: var(--accent); background: var(--accent); color: var(--on-accent); }
-  .vault-btn[data-armed] { border-color: var(--alert); background: var(--alert-bg); color: var(--alert); }
-  .vault-body { flex: 1; min-height: 0; display: flex; flex-direction: column; overflow: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
-  .vault-pane { box-sizing: border-box; width: 100%; max-width: 420px; margin: 0 auto; padding: 32px 16px; display: grid; gap: 14px; }
-  .vault-pane[hidden] { display: none; }
-  .vault-pane h3 { margin: 0; font-size: 17px; line-height: 1.4; }
-  .vault-pane p { margin: 0; }
-  .vault-pane label { font-weight: 700; }
-  .vault-hint { font-size: 13px; color: var(--muted); }
-  .vault-msg { min-height: 1.6em; font-size: 14px; color: var(--alert); }
-  #vault-imp-msg, #vault-view-msg { color: var(--muted); }
-  .vault-pin { font: inherit; font-family: var(--font-mono); font-size: 30px; line-height: 1.2; letter-spacing: .5em; text-indent: .5em; text-align: center;
-    box-sizing: border-box; width: 100%; min-height: 56px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); color: var(--fg);
-    -webkit-text-security: disc; text-security: disc; }
-  .vault-pin:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-  .vault-shake { animation: vault-shake .3s; }
-  @keyframes vault-shake { 20% { transform: translateX(-8px); } 40% { transform: translateX(8px); } 60% { transform: translateX(-5px); } 80% { transform: translateX(5px); } }
-  @media (prefers-reduced-motion: reduce) { .vault-shake { animation: none; } }
-  .vault-file { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; pointer-events: none; }
-  .vault-view { flex: 1; min-height: 0; display: flex; flex-direction: column; }
-  .vault-view[hidden] { display: none; }
-  .vault-stage { flex: 1; min-height: 0; overflow: auto; background: #fff; }
-  .vault-stage img { display: block; width: 100%; max-width: 720px; height: auto; margin: 0 auto; }
-  .vault-stage iframe { display: block; width: 100%; height: 100%; min-height: 60vh; border: 0; background: #fff; }
-  .vault-foot { flex: none; display: grid; gap: 8px; padding: 10px 16px; border-top: 1px solid var(--line); background: var(--bg); }
-  .vault-foot .row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-  .vault-foot p { margin: 0; font-size: 13px; line-height: 1.5; color: var(--muted); }
-  .vault-foot a { color: var(--accent); }
-
 </style>
 <div class="topbar" role="tablist" aria-label="主要分頁"><div class="topbar-in"><button type="button" class="toptab" role="tab" id="tt-safety" data-top="safety" aria-selected="true" aria-controls="top-safety">安全卡</button><button type="button" class="toptab" role="tab" id="tt-routes" data-top="routes" aria-selected="false" aria-controls="top-routes">路線</button></div></div>
 <div id="top-safety" role="tabpanel" aria-labelledby="tt-safety"><div id="pane-safety"></div></div>
@@ -579,12 +541,6 @@
     .flights { grid-template-columns: 1fr 1fr; }
     .fields { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   }
-
-  .vault { margin-top: 28px; display: grid; gap: 8px; }
-  .vault-open { font: inherit; font-size: 16px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px;
-    min-height: 52px; padding: 0 16px; border-radius: 12px; border: 1px solid var(--accent); background: var(--surface); color: var(--accent); cursor: pointer; }
-  .vault-open:hover, .vault-open:active { background: var(--accent-soft); }
-  .vault-note { font-size: 13px; line-height: 1.5; color: var(--muted); text-align: center; }
 </style><div class="wrap">
   <nav class="nav" aria-label="頁面章節">
     <a href="#emergency" data-goto="emergency">緊急資訊</a>
@@ -823,43 +779,9 @@
     <p>住宿地址與入住時間參考 KAYAK 的 Ever8 Serviced Residence 頁面，請以訂房確認信為準。</p>
     <p>緊急電話與機場鐵路班次等資訊可能更新，出發前請再查官方來源。</p>
   </footer>
-
-  <div class="vault">
-    <button class="vault-open" type="button" id="vault-open" aria-haspopup="dialog">
-      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"></rect><path d="M8 11V8a4 4 0 0 1 8 0v3"></path></svg>
-      <span>Hsuan的入境卡</span>
-    </button>
-    <p class="vault-note">要輸入密碼才能打開。檔案只存在這支手機裡。</p>
-  </div>
 </div>
 
 </template>
-<div id="vault" class="vault-ov" role="dialog" aria-modal="true" aria-labelledby="vault-title" hidden>
-  <div class="vault-bar"><h2 id="vault-title">Hsuan的入境卡</h2><button type="button" class="vault-x" id="vault-close">關閉</button></div>
-  <div class="vault-body">
-    <form id="vault-pin" class="vault-pane" autocomplete="off" novalidate>
-      <label for="vault-pin-in">輸入 4 位數密碼</label>
-      <input id="vault-pin-in" class="vault-pin" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="done" aria-describedby="vault-pin-msg">
-      <p id="vault-pin-msg" class="vault-msg" role="alert"></p>
-      <button type="submit" class="vault-btn main">打開</button>
-    </form>
-    <div id="vault-import" class="vault-pane" hidden>
-      <h3>這支手機還沒存入境卡</h3>
-      <p>選入境卡的截圖（最穩）或 PDF。只會存在這支手機裡，不會上傳。存好後，下次輸入密碼就能直接看。</p>
-      <button type="button" id="vault-pick" class="vault-btn main">選擇檔案</button>
-      <p id="vault-imp-msg" class="vault-msg" role="status"></p>
-    </div>
-    <div id="vault-view" class="vault-view" hidden>
-      <div id="vault-stage" class="vault-stage"></div>
-      <div class="vault-foot">
-        <p id="vault-view-msg" class="vault-msg" role="status"></p>
-        <p id="vault-pdf-help" hidden>PDF 沒顯示？<a id="vault-pdf-link" href="#" target="_blank" rel="noopener">用瀏覽器開啟</a>，或改存截圖。</p>
-        <div class="row"><button type="button" id="vault-swap" class="vault-btn">換一張</button><button type="button" id="vault-del" class="vault-btn">刪除</button></div>
-      </div>
-    </div>
-    <input id="vault-file" class="vault-file" type="file" accept="image/*,application/pdf" tabindex="-1" aria-hidden="true">
-  </div>
-</div>
 <div id="top-routes" role="tabpanel" aria-labelledby="tt-routes" hidden>
 
 <div class="wrap">
@@ -1268,223 +1190,7 @@
   else if (days.indexOf(h) >= 0) { cur.top = 'routes'; cur.day = h; }
   paint();
 })();
-</script>
-<script>
-/* 「Hsuan的入境卡」：放在她手機本機的小保險箱。改這裡之前先看 CLAUDE.md 的「入境卡」一節。
-   1. 入境卡本身絕對不進 repo（repo 是公開的）。檔案由 Hsuan 在自己手機上匯入，只存在這支手機的 IndexedDB，不會上傳。
-   2. 密碼只是畫面上的鎖：擋手機被旁人瞄到、隨手點開。程式碼是公開的，所以它不是加密，也不能當成保護。
-   3. 看完卡片、切到別的 App 或鎖屏時自動關閉（回到密碼畫面）。 */
-(function () {
-  var host = document.getElementById('pane-safety');
-  var ov = document.getElementById('vault');
-  if (!host || !host.shadowRoot || !ov) return;
-  var openBtn = host.shadowRoot.getElementById('vault-open');
-  if (!openBtn) return;
-
-  var DB = 'seoul-vault', STORE = 'files', KEY = 'hsuan-arrival';
-  var PIN_HASH = 613358874656359, MAX_BYTES = 15 * 1024 * 1024;
-  function $(id) { return document.getElementById(id); }
-  var el = {
-    close: $('vault-close'), pinForm: $('vault-pin'), pinIn: $('vault-pin-in'), pinMsg: $('vault-pin-msg'),
-    imp: $('vault-import'), impMsg: $('vault-imp-msg'), pick: $('vault-pick'), file: $('vault-file'),
-    view: $('vault-view'), stage: $('vault-stage'), viewMsg: $('vault-view-msg'), pdfHelp: $('vault-pdf-help'),
-    pdfLink: $('vault-pdf-link'), swap: $('vault-swap'), del: $('vault-del')
-  };
-  var st = 'closed', tok = 0, url = '', mem = null, armTimer = 0, pinTimer = 0;
-
-  /* ---- 密碼檢查（cyrb53；不依賴 crypto.subtle，所以在任何環境都能用） ---- */
-  function h53(str, seed) {
-    var h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
-    for (var i = 0, ch; i < str.length; i++) {
-      ch = str.charCodeAt(i);
-      h1 = Math.imul(h1 ^ ch, 2654435761);
-      h2 = Math.imul(h2 ^ ch, 1597334677);
-    }
-    h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
-    h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
-    return 4294967296 * (2097151 & h2) + (h1 >>> 0);
-  }
-
-  /* ---- IndexedDB：存 ArrayBuffer + 檔案類型（比直接存 Blob 在 iOS 上穩） ---- */
-  function idb() {
-    return new Promise(function (res, rej) {
-      if (!window.indexedDB) { rej(new Error('no indexedDB')); return; }
-      var r;
-      try { r = indexedDB.open(DB, 1); } catch (e) { rej(e); return; }
-      r.onupgradeneeded = function () { r.result.createObjectStore(STORE); };
-      r.onsuccess = function () { res(r.result); };
-      r.onerror = function () { rej(r.error || new Error('idb open')); };
-      r.onblocked = function () { rej(new Error('idb blocked')); };
-    });
-  }
-  function run(mode, fn) {
-    return idb().then(function (db) {
-      return new Promise(function (res, rej) {
-        var req;
-        try { req = fn(db.transaction(STORE, mode).objectStore(STORE)); } catch (e) { db.close(); rej(e); return; }
-        var t = req.transaction;
-        t.oncomplete = function () { db.close(); res(req.result); };
-        t.onerror = t.onabort = function () { db.close(); rej(t.error || new Error('idb tx')); };
-      });
-    });
-  }
-  function loadRec() {
-    return run('readonly', function (s) { return s.get(KEY); }).then(function (r) { return r || mem; }, function () { return mem; });
-  }
-  function saveRec(rec) { return run('readwrite', function (s) { return s.put(rec, KEY); }); }
-  function delRec() { return run('readwrite', function (s) { return s.delete(KEY); }); }
-  function persist() { try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(function () {}); } catch (e) {} }
-
-  /* ---- 畫面狀態：pin → import（還沒存卡）或 view（已存卡） ---- */
-  function show(name) {
-    st = name;
-    el.pinForm.hidden = name !== 'pin';
-    el.imp.hidden = name !== 'import';
-    el.view.hidden = name !== 'view';
-  }
-  function say(node, text) { node.textContent = text || ''; }
-  function disarm() { clearTimeout(armTimer); el.del.removeAttribute('data-armed'); el.del.textContent = '刪除'; }
-  function dropUrl(delay) {
-    var u = url; url = '';
-    if (!u) return;
-    if (delay) setTimeout(function () { URL.revokeObjectURL(u); }, delay); else URL.revokeObjectURL(u);
-  }
-
-  function openVault() {
-    tok++;
-    document.documentElement.classList.add('vault-on');
-    ov.hidden = false;
-    el.pinIn.value = '';
-    say(el.pinMsg, ''); say(el.impMsg, ''); say(el.viewMsg, '');
-    show('pin');
-    setTimeout(function () { try { el.pinIn.focus(); } catch (e) {} }, 40);
-  }
-  function closeVault() {
-    tok++; clearTimeout(pinTimer); disarm();
-    dropUrl(60000);                                  // 晚一點再釋放：「用瀏覽器開啟」的新分頁可能還在讀它
-    el.stage.textContent = '';
-    ov.hidden = true;
-    document.documentElement.classList.remove('vault-on');
-    el.pinIn.value = '';
-    show('pin'); st = 'closed';
-    try { openBtn.focus(); } catch (e) {}
-  }
-
-  function showCard(rec) {
-    dropUrl(0); disarm();
-    say(el.viewMsg, '');
-    el.stage.textContent = '';
-    var isPdf = rec.type === 'application/pdf';
-    url = URL.createObjectURL(new Blob([rec.buf], { type: rec.type }));
-    if (isPdf) {
-      var f = document.createElement('iframe');
-      f.title = 'Hsuan的入境卡（PDF）'; f.src = url;
-      el.stage.appendChild(f);
-      el.pdfLink.href = url;
-    } else {
-      var img = new Image();
-      img.alt = 'Hsuan的入境卡';
-      img.onerror = function () { el.stage.textContent = ''; say(el.viewMsg, '這個檔案顯示不出來。按「換一張」，改選入境卡的截圖。'); };
-      img.src = url;
-      el.stage.appendChild(img);
-    }
-    el.pdfHelp.hidden = !isPdf;
-    show('view');
-  }
-
-  function tryPin() {
-    if (st !== 'pin') return;
-    clearTimeout(pinTimer);
-    var v = el.pinIn.value;
-    if (v.length !== 4) { say(el.pinMsg, '請輸入 4 位數字'); return; }
-    el.pinIn.value = '';
-    if (h53('seoul-vault|' + v, 7) !== PIN_HASH) {
-      say(el.pinMsg, '密碼不對，再試一次');
-      el.pinIn.classList.remove('vault-shake'); void el.pinIn.offsetWidth; el.pinIn.classList.add('vault-shake');
-      el.pinIn.focus();
-      return;
-    }
-    say(el.pinMsg, '');
-    var my = ++tok;
-    loadRec().then(function (rec) {
-      if (my !== tok || ov.hidden) return;
-      if (rec) showCard(rec); else show('import');
-    });
-  }
-
-  function readBuf(file) {
-    return new Promise(function (res, rej) {
-      var r = new FileReader();
-      r.onload = function () { res(r.result); };
-      r.onerror = function () { rej(r.error); };
-      r.readAsArrayBuffer(file);
-    });
-  }
-  function onFile() {
-    var f = el.file.files && el.file.files[0];
-    el.file.value = '';                              // 讓同一個檔案可以再選一次
-    if (!f || ov.hidden) return;
-    var msg = st === 'view' ? el.viewMsg : el.impMsg;
-    var type = f.type || (/\.pdf$/i.test(f.name) ? 'application/pdf' : '');
-    if (!/^image\//.test(type) && type !== 'application/pdf') { say(msg, '這不是圖片或 PDF，請再選一次'); return; }
-    if (f.size > MAX_BYTES) { say(msg, '檔案太大（上限 15 MB），請改用截圖'); return; }
-    say(msg, '存入中…');
-    var my = ++tok;
-    readBuf(f).then(function (buf) {
-      var rec = { buf: buf, type: type, name: f.name, at: Date.now() };
-      mem = rec;
-      return saveRec(rec).then(function () { persist(); return true; }, function () { return false; }).then(function (saved) {
-        if (my !== tok || ov.hidden) return;
-        showCard(rec);
-        if (!saved) say(el.viewMsg, '這個瀏覽器存不進去（可能是無痕模式或空間不足）。這次先顯示，關掉頁面後要重選。');
-      });
-    }).catch(function () { say(msg, '讀不到這個檔案，請再選一次'); });
-  }
-
-  function onDelete() {
-    if (!el.del.hasAttribute('data-armed')) {
-      el.del.setAttribute('data-armed', '1'); el.del.textContent = '再按一次確認刪除';
-      armTimer = setTimeout(disarm, 4000);
-      return;
-    }
-    disarm(); mem = null;
-    var my = ++tok;
-    delRec().catch(function () {}).then(function () {
-      if (my !== tok || ov.hidden) return;
-      dropUrl(0); el.stage.textContent = '';
-      show('import'); say(el.impMsg, '已從這支手機刪除');
-    });
-  }
-
-  function trapTab(e) {
-    var list = [].slice.call(ov.querySelectorAll('button, input, a[href], iframe')).filter(function (n) { return !n.closest('[hidden]') && !n.disabled && n.offsetParent !== null; });
-    if (!list.length) return;
-    var first = list[0], last = list[list.length - 1], a = document.activeElement;
-    if (e.shiftKey && (a === first || !ov.contains(a))) { e.preventDefault(); last.focus(); }
-    else if (!e.shiftKey && (a === last || !ov.contains(a))) { e.preventDefault(); first.focus(); }
-  }
-
-  openBtn.addEventListener('click', openVault);
-  el.close.addEventListener('click', closeVault);
-  el.pinForm.addEventListener('submit', function (e) { e.preventDefault(); tryPin(); });
-  el.pinIn.addEventListener('input', function () {
-    el.pinIn.value = el.pinIn.value.replace(/\D/g, '').slice(0, 4);
-    say(el.pinMsg, '');
-    clearTimeout(pinTimer);
-    if (el.pinIn.value.length === 4) pinTimer = setTimeout(tryPin, 150);
-  });
-  el.pick.addEventListener('click', function () { el.file.click(); });
-  el.swap.addEventListener('click', function () { el.file.click(); });
-  el.file.addEventListener('change', onFile);
-  el.del.addEventListener('click', onDelete);
-  ov.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape') { closeVault(); return; }
-    if (e.key === 'Tab') trapTab(e);
-  });
-  document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'hidden' && st === 'view') closeVault(); });
-  window.addEventListener('pagehide', function () { if (st === 'view') closeVault(); });
-})();
-</script><p class="buildinfo">版本 71fb7f0 · 更新於 10/11 03:20</p>
+</script><p class="buildinfo">版本 44255a7 · 更新於 10/11 03:41</p>
 <style>
   .topbar-in.has-offl { grid-template-columns: 1fr 1fr auto; }
   .offl { font: inherit; font-size: 13px; font-weight: 600; line-height: 1.2; padding: 0 10px; border-radius: 10px;

@@ -551,61 +551,12 @@ DOCS = """<h3 class="group-title">證件與護照</h3>
 sub('<h3 class="group-title">出發前</h3>', DOCS + '<h3 class="group-title">出發前</h3>')
 assert '新村' not in s_body.replace('新村站', '') or True
 
-# ----- 「Hsuan的入境卡」：安全卡最下面的按鈕（入境卡本身不進 repo，由她在手機上匯入；邏輯見 vault.js） -----
-VAULT_BTN = '''
-  <div class="vault">
-    <button class="vault-open" type="button" id="vault-open" aria-haspopup="dialog">
-      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"></rect><path d="M8 11V8a4 4 0 0 1 8 0v3"></path></svg>
-      <span>Hsuan的入境卡</span>
-    </button>
-    <p class="vault-note">要輸入密碼才能打開。檔案只存在這支手機裡。</p>
-  </div>
-'''
-sub('  </footer>\n</div>', '  </footer>\n' + VAULT_BTN + '</div>')
-VAULT_SHADOW_CSS = '''
-  .vault { margin-top: 28px; display: grid; gap: 8px; }
-  .vault-open { font: inherit; font-size: 16px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px;
-    min-height: 52px; padding: 0 16px; border-radius: 12px; border: 1px solid var(--accent); background: var(--surface); color: var(--accent); cursor: pointer; }
-  .vault-open:hover, .vault-open:active { background: var(--accent-soft); }
-  .vault-note { font-size: 13px; line-height: 1.5; color: var(--muted); text-align: center; }
-'''
-s_css = s_css + VAULT_SHADOW_CSS
-
-VAULT_DLG = '''<div id="vault" class="vault-ov" role="dialog" aria-modal="true" aria-labelledby="vault-title" hidden>
-  <div class="vault-bar"><h2 id="vault-title">Hsuan的入境卡</h2><button type="button" class="vault-x" id="vault-close">關閉</button></div>
-  <div class="vault-body">
-    <form id="vault-pin" class="vault-pane" autocomplete="off" novalidate>
-      <label for="vault-pin-in">輸入 4 位數密碼</label>
-      <input id="vault-pin-in" class="vault-pin" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="done" aria-describedby="vault-pin-msg">
-      <p id="vault-pin-msg" class="vault-msg" role="alert"></p>
-      <button type="submit" class="vault-btn main">打開</button>
-    </form>
-    <div id="vault-import" class="vault-pane" hidden>
-      <h3>這支手機還沒存入境卡</h3>
-      <p>選入境卡的截圖（最穩）或 PDF。只會存在這支手機裡，不會上傳。存好後，下次輸入密碼就能直接看。</p>
-      <button type="button" id="vault-pick" class="vault-btn main">選擇檔案</button>
-      <p id="vault-imp-msg" class="vault-msg" role="status"></p>
-    </div>
-    <div id="vault-view" class="vault-view" hidden>
-      <div id="vault-stage" class="vault-stage"></div>
-      <div class="vault-foot">
-        <p id="vault-view-msg" class="vault-msg" role="status"></p>
-        <p id="vault-pdf-help" hidden>PDF 沒顯示？<a id="vault-pdf-link" href="#" target="_blank" rel="noopener">用瀏覽器開啟</a>，或改存截圖。</p>
-        <div class="row"><button type="button" id="vault-swap" class="vault-btn">換一張</button><button type="button" id="vault-del" class="vault-btn">刪除</button></div>
-      </div>
-    </div>
-    <input id="vault-file" class="vault-file" type="file" accept="image/*,application/pdf" tabindex="-1" aria-hidden="true">
-  </div>
-</div>
-'''
-
 TOP_OPEN = ('<div class="topbar" role="tablist" aria-label="主要分頁"><div class="topbar-in">'
             '<button type="button" class="toptab" role="tab" id="tt-safety" data-top="safety" aria-selected="true" aria-controls="top-safety">安全卡</button>'
             '<button type="button" class="toptab" role="tab" id="tt-routes" data-top="routes" aria-selected="false" aria-controls="top-routes">路線</button>'
             '</div></div>\n'
             '<div id="top-safety" role="tabpanel" aria-labelledby="tt-safety"><div id="pane-safety"></div></div>\n'
             '<template id="safety-tpl"><style>' + s_css + '</style>' + s_body + '</template>\n'
-            + VAULT_DLG +
             '<div id="top-routes" role="tabpanel" aria-labelledby="tt-routes" hidden>\n')
 
 TOPSCRIPT = r"""<script>
@@ -689,8 +640,6 @@ TOPSCRIPT = r"""<script>
 })();
 </script>"""
 
-TOPSCRIPT = TOPSCRIPT + '\n<script>\n' + open(SP + 'vault.js', encoding='utf-8').read() + '</script>'
-
 EXTRA3 = r"""
   :root { --alert: #b3261e; --alert-bg: #fde7e4; --topbar-h: 52px; }
   @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --alert: #ff9a90; --alert-bg: #3a1916; } }
@@ -706,7 +655,7 @@ EXTRA3 = r"""
 
 old2 = "extra_css = extra_css_old + EXTRA2\n"
 
-extra_css = extra_css_old + EXTRA2 + EXTRA3 + open(SP + 'vault.css', encoding='utf-8').read()
+extra_css = extra_css_old + EXTRA2 + EXTRA3
 tabs = [('ov', '總覽'), ('d1', 'D1 · 10/13'), ('d2', 'D2 · 10/14'), ('d3', 'D3 · 10/15'), ('d4', 'D4 · 10/16')]
 panels = {'ov': ov, 'd1': d1, 'd2': d2, 'd3': d3, 'd4': d4, 'd5': d5}
 
