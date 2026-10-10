@@ -168,6 +168,13 @@ d2_svg = strip(d2_nodes, d2_segs, {}, 'D2 梨大到聖水、新沙，再回聖�
 
 d2 = '<div class="panel-body">' + head('D2', '10/14（三）· 白天聖水，傍晚新沙', '聖水 → 新沙 → 聖水') + \
     card(d2_svg, '梨大 → 聖水 → 新沙（18:30）→ 聖水晚餐 → 梨大') + \
+    '<h3 class="h3">午餐：二選一</h3>' + \
+    chips([('솔솥 釜飯', U + 'bBeP8iwVV3Q9sXoj7'), ('데이릿 DAYLIT 韓式融合', U + 'sd923JjcAAgWYvGKA')]) + \
+    notes([
+        '솔솥 釜飯 <span class="ko">솔솥 성수점</span>：聖水站 3 號口步行約 5 分。11:30–21:00，最後點餐 20:20；平日午餐最後點餐 14:20，之後休息。',
+        '데이릿 <span class="ko">DAYLIT</span>（B1）：纛島站 <span class="ko">뚝섬</span>（聖水前一站）步行約 3–5 分。11:30–21:30，最後點餐 20:30；平日 14:30–17:00 休息。',
+        '10/14 是週三，午餐請在 14:00 前到。營業時間查自韓國餐廳網站與部落格，出發前以 Google 地圖當天顯示為準。',
+    ]) + \
     '<h3 class="h3">聖水可以逛的店</h3>' + \
     chips([('自然島鹽麵包', U + 'R3Hcxf3a5gEijn6G8'), ('Stand oil', U + 'ouAPx7aC1JFmtcfm7'), ('Wacky willy', U + 'tMkUdDnRnLL5ENer7'),
            ('Tamburins', U + '95G1crrtgBN1NNnz6'), ('Double lover', U + '1huZgn8fiqcspLRm9'), ('North face white label', U + 'Wu689jQxZAEWQWEE8'),
