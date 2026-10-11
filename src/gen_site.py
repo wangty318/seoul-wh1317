@@ -112,6 +112,7 @@ PLACES = {
         'dinner': [('祖傳三代馬鈴薯排骨湯（Naver）', 'https://naver.me/xD89xHu6')],     # 安全卡的晚餐列另有「診所結束後」的說明，手寫
     },
     'd3': {
+        'lunch': [('乙支餃子', gcid(10865566235764286574))],               # 10/12 使用者指定（Google 地圖：乙支餃子 을지만두，乙支路 6 街）
         'shops': [('廣藏市場', U + 'rWq4qu4DyfQMMnRy8'), ('Nyunyu（東大門）', U + 'S6QHsHDPZqyZeqp77'),
                   ('apM（20:00）', U + 'KLETYgsoou98Fwer6'), ('apM Place', gcid(4968386951333458730)),
                   ('東大門 Migliore', gcid(8229626887675014767)), ('DOOTA Mall', gcid(1834824361273245074)),
@@ -171,6 +172,7 @@ HOURS = {
     ('d2', 'Satur House'): '12:00～20:00',   # 세터하우스 성수 (Satur House)
     ('d2', 'Atiissu'): '11:00～21:00',   # ATiiSSU HAUS NOWHERE SEOUL
     ('d2', '祖傳三代馬鈴薯排骨湯（Naver）'): ('祖傳三代馬鈴薯排骨湯', '24 小時'),   # Somunnan Seongsu Gamjatang
+    ('d3', '乙支餃子'): '10:00～24:00',   # 乙支餃子 을지만두（每天 10:00–00:00）
     ('d3', '廣藏市場'): None,   # 廣藏市場
     ('d3', 'Nyunyu（東大門）'): ('Nyunyu 東大門', '11:00～05:00'),   # Nyunyu Wholesale Dongdaemun
     ('d3', 'apM（20:00）'): ('apM', '10:30～01:00'),   # HelloAPM
@@ -356,6 +358,11 @@ d3_svg = strip(d3_nodes, d3_segs, {}, 'D3 梨大到東大門一帶再回住宿�
 d3 = '<div class="panel-body">' + head('D3', '10/15（四）· 光藏、東大門', '東大門一帶') + \
     notes([HOURS_NOTE]) + \
     card(d3_svg, '梨大 → 乙支路4街 → 東大門歷史文化公園 → 梨大') + \
+    '<h3 class="h3">午餐：餃子</h3>' + \
+    chips(PLACES['d3']['lunch']) + \
+    notes([
+        '乙支餃子 <span class="ko">을지만두</span>：在乙支路 6 街，離東大門歷史文化公園站約 300 m（直線）。',
+    ]) + \
     '<h3 class="h3">東大門可以逛的店</h3>' + \
     chips(PLACES['d3']['shops'] + dn(PLACES['d3']['dinner'])) + \
     notes([
@@ -656,7 +663,7 @@ def _swap_row(day_no, dt, new_rows):
 _swap_row('D1', '白天', _srow('午餐', PLACES['d1']['lunch']) + _srow('白天', PLACES['d1']['shops']))
 _swap_row('D1', '晚餐', _srow('晚餐', PLACES['d1']['dinner']) + _srow('安國一帶', PLACES['d1']['extra']))
 _swap_row('D2', '白天', _srow('午餐', PLACES['d2']['lunch']) + _srow('白天', PLACES['d2']['shops']))
-_swap_row('D3', '白天', _srow('白天', PLACES['d3']['shops']))
+_swap_row('D3', '白天', _srow('午餐', PLACES['d3']['lunch']) + _srow('白天', PLACES['d3']['shops']))
 _swap_row('D3', '晚餐', _srow('晚餐', PLACES['d3']['dinner']))
 _swap_row('D4', '白天', _srow('白天', PLACES['d4']['shops']) + _srow('吃喝', PLACES['d4']['food']))
 _swap_row('D4', '晚餐', _srow('晚餐', PLACES['d4']['dinner']))

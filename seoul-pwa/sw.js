@@ -3,9 +3,9 @@
  *   頁面快取（index.html、manifest）：每次改行程都會換新。
  *   資源快取（圖示、1.7MB 地鐵圖）：圖不變就不會重新下載。
  * 策略：頁面（navigate）網路優先、強制向伺服器重新驗證，3 秒沒回應就用快取；其餘靜態檔快取優先。 */
-const PAGE_V = '6b99fc85ee';
+const PAGE_V = '29a5f4899c';
 const ASSET_V = 'c638688adc';
-const BUILD_ID = 'e996c485380a';
+const BUILD_ID = '155b4bd8826f';
 const PAGE_CACHE = 'seoul-page-' + PAGE_V;
 const ASSET_CACHE = 'seoul-assets-' + ASSET_V;
 const PAGE_FILES = ['./', './index.html', './manifest.webmanifest'];
