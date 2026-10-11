@@ -17,12 +17,13 @@ routes = page[page.index('<div id="top-routes"'):]
 
 def plain(h):
     h = re.sub(r'<(script|style|svg)\b.*?</\1>', ' ', h, flags=re.S)
+    h = re.sub(r'</?em[^>]*>', '', h)                       # chip 裡包營業時間的 <em class="hr">，是行內標記，不能當成空白
     return re.sub(r'\s+', ' ', html.unescape(re.sub(r'<[^>]+>', ' ', h)))
 
 
 def norm(label):
     """路線頁 chip 標籤 → 安全卡寫法：去掉「晚餐：」前綴與「（Naver）」後綴"""
-    return re.sub(r'（Naver）$', '', re.sub(r'^晚餐：', '', html.unescape(label))).strip()
+    return re.sub(r'（Naver）$', '', re.sub(r'^晚餐：', '', html.unescape(re.sub(r'</?em[^>]*>', '', label)))).strip()
 
 
 results = []
@@ -41,11 +42,15 @@ for i, day in enumerate(['d1', 'd2', 'd3', 'd4']):
     r_labels = [norm(m) for m in re.findall(r'<a href="[^"]*" target="_blank" rel="noopener">(.*?)</a>', panel)]
     r_labels = [l for l in r_labels if not re.match(r'\d{1,2}:\d{2}', l)]   # 「18:30 新沙站 3 號口」是時間點，不是地點
     card_text = plain(cards[i])
-    s_chips = [html.unescape(m) for m in re.findall(r'<span class="chip">(.*?)</span>', cards[i])]
+    s_chips = [html.unescape(re.sub(r'</?em[^>]*>', '', m)) for m in re.findall(r'<span class="chip">(.*?)</span>', cards[i])]
     missing = [l for l in r_labels if l not in card_text]
     extra = [c for c in s_chips if c not in r_labels]
     ok('%s 路線頁的每個地點，安全卡這天都有' % day.upper(), r_labels and not missing, '缺：' + '、'.join(missing))
     ok('%s 安全卡這天沒有路線頁沒有的地點' % day.upper(), not extra, '多：' + '、'.join(extra))
+    # 格式：店名（營業時間）。營業時間 = HH:MM～HH:MM（可多段、用「、」分隔）、「24 小時」或「無營業時間資料」
+    hours_re = r'（(?:\d{2}:\d{2}～\d{2}:\d{2}(?:、\d{2}:\d{2}～\d{2}:\d{2})*|24 小時|無營業時間資料)）'
+    bad = [l for l in r_labels if not re.search(r'\S' + hours_re + r'$', l)]
+    ok('%s 每個地點都是「店名（營業時間）」格式' % day.upper(), r_labels and not bad, '不符：' + '、'.join(bad))
 
 # ---- 日期、固定資訊兩邊都要有 ----
 for d in ['10/13（二）', '10/14（三）', '10/15（四）', '10/16（五）', '10/17（六）']:

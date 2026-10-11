@@ -13,7 +13,7 @@
 1. **取得推送權限**：`add_repo(owner="wangty318", repo="seoul-wh1317", access="push")`，照回傳指示 clone 後 `register_repo_root`。前提有兩個：使用者已在 claude.ai 連結 GitHub，且已在他的 GitHub 帳號安裝 Claude GitHub App 並授權這個 repo（https://github.com/apps/claude/installations/select_target）。若回傳 `push_check: refused`，代表第二項還沒做，推送會被拒絕，請使用者先完成。
 2. **改來源**（見「來源在哪」）。**不要手改**根目錄的 `index.html`（導向頁）與整個 `seoul-pwa/`（`index.html`、`sw.js`、`manifest.webmanifest`、`version.json`、`icons/`、`seoul-metro-map.jpg`），它們都是 build 產物。
 3. **重建**：`python3 src/build.py`（輸出到 `seoul-pwa/` 並更新根目錄導向頁；內容沒變時輸出完全相同，不會產生多餘的 git 變更）。
-4. **測試**：`NODE_PATH=$(npm root -g) node tests/pwa_test.js`（29 項）、`NODE_PATH=$(npm root -g) node tests/layout_test.js`（8 項，兩個網址都能開）與 `python3 tests/sync_test.py`（22 項，安全卡與路線兩個分頁的地點、日期、固定資訊要一致），必須全過。再用 Playwright 手機尺寸（390×844）截圖看改到的畫面。
+4. **測試**：`NODE_PATH=$(npm root -g) node tests/pwa_test.js`（29 項）、`NODE_PATH=$(npm root -g) node tests/layout_test.js`（8 項，兩個網址都能開）與 `python3 tests/sync_test.py`（26 項，安全卡與路線兩個分頁的地點、日期、固定資訊要一致，每個地點 chip 都要是「店名（營業時間）」格式），必須全過。再用 Playwright 手機尺寸（390×844）截圖看改到的畫面。
 5. **提交並推到 `main`**，commit 訊息用中文簡述改了什麼，結尾附上 session 規定的 attribution。
 6. **確認上線**：等 1–3 分鐘，WebFetch `https://wangty318.github.io/seoul-wh1317/seoul-pwa/version.json`，其中 `build` 要和本機 `seoul-pwa/version.json` 一致。
 7. **回報使用者**：改了什麼（白話）、版本號與更新時間、她們怎麼拿到（見下）。
@@ -28,7 +28,7 @@
 ## 來源在哪（全在 `src/`）
 | 要改什麼 | 去哪改 |
 |---|---|
-| **每天的地點 chip**（午餐／逛的店／吃喝咖啡／晚餐／安國一帶） | `gen_site.py` 的 `PLACES`（**路線頁與安全卡的「每日行程」共用這一份**，改這裡兩邊一起變；安全卡那幾列由 `_srow`／`_swap_row` 產生，不要去手改 `seoul-safety.html` 裡的 chip）。營業時間與步行距離的說明仍寫在各天的 `notes([...])`（只在路線頁） |
+| **每天的地點 chip**（午餐／逛的店／吃喝咖啡／晚餐／安國一帶） | `gen_site.py` 的 `PLACES`（**路線頁與安全卡的「每日行程」共用這一份**，改這裡兩邊一起變；安全卡那幾列由 `_srow`／`_swap_row` 產生，不要去手改 `seoul-safety.html` 裡的 chip）。**每個 chip 的文字一律是「店名（營業時間）」**，營業時間來自 `HOURS`（見下「加地點與營業時間的慣例」）；步行距離與提醒仍寫在各天的 `notes([...])`（只在路線頁） |
 | 路線 D1–D5、總覽、怎麼認方向 | `gen_site.py`：`# ===== D1` … `# ===== overview` 各區塊（`dN_nodes` 是站點，`dN` 是整頁） |
 | 安全卡內容 | `seoul-safety.html`（原始），加上 `gen_site.py` 的 `sub(舊字串, 新字串)` 替換與 `DOCS`（證件與護照清單） |
 | 安全卡「航班」下面的「航班截圖」展開列 | `gen_site.py` 的 `SHOT_HTML`／`SHOT_CSS`（原生 `<details>`）；圖檔 `src/flights.jpg`（訂票 App 行程截圖，1080×938 JPEG，72 KB）。換圖時：先確認沒有姓名、訂位代號、機票號碼（repo 公開），尺寸若變了要同步改 `SHOT_HTML` 的 width／height 與 `pwa_test.js` 的 D12 |
@@ -42,7 +42,10 @@
 
 ### 加地點與營業時間的慣例
 - 使用者的 Google 地圖清單「首爾」（63 點，2026-10-11 讀過）是「想去的點」來源。清單連結不要放進 repo。新增的點加進 `PLACES` 對應那天，用 `gcid(cid)`（`https://www.google.com/maps?cid=…`，cid 要轉成無號整數），不必短網址。
-- 店家、百貨只放連結；餐廳與咖啡廳另加營業時間，並註明來源與查詢日期。營業時間優先讀 Google 地圖頁面（內建瀏覽器開 cid 連結，表格在 DOM 裡；有的要先點「查看更詳細的營業時間」），Google 沒資料才查 다이닝코드或部落格，且要寫明「Google 地圖沒有營業時間」。
+- **所有地點（店家、百貨、餐廳、咖啡廳）的 chip 都是「店名（營業時間）」**，例：`豬腳小姐 미쓰족발（11:00～03:00）`。格式規則：全形「～」；多段用「、」（`11:30～15:00、17:00～21:00`）；跨過午夜寫實際結束時間（`11:00～03:00`），午夜整點寫 `24:00`；全天營業寫 `24 小時`；Google 地圖沒有營業時間就寫 `無營業時間資料`（目前 4 個：&meal 三明治 鐘閣、廣藏市場、Hook 烤肉 新堂、MIXXO 弘大），並在該天 notes 說「Google 地圖沒有營業時間，出發前先問店家」。
+- 資料放在 `gen_site.py` 的 `HOURS`（鍵是 `(天, PLACES 裡的原名)`，值是時間字串，或 `(顯示用店名, 時間字串)`；`None` 代表無資料）。`PLACES` 由 `_with_hours` 組出，**少一筆 `HOURS` 就會 KeyError、build 失敗**，所以新增地點一定會被逼著補營業時間。時間取「那天星期幾」的 Google 地圖顯示（D1 週二、D2 週三、D3 週四、D4 週五，2026-10-11 查），頁面上有一句 `HOURS_NOTE` 說明；週間休息日（如 D3 的 Dapeojwo 週三休）寫在該天 notes。
+- 讀營業時間的方法：Google 地圖頁面（內建瀏覽器開 cid 連結，表格在 DOM 裡；有的要先點「查看更詳細的營業時間」，點完等 2–3 秒再讀）。Google 沒資料就寫 `無營業時間資料`，不要改用部落格的數字混進來（來源不一致、容易過時）。
+- chip 內每段 `HH:MM～HH:MM` 由 `lbl()` 包 `<em class="hr">`（`white-space: nowrap`），窄螢幕只會在店名／括號／「、」換行，不會把時間拆開。改測試或爬 chip 文字時，要先去掉 `<em>` 標籤（`sync_test.py` 已處理）。
 - 午餐選項放在各天的「午餐」區塊，要提醒當天是星期幾與平日下午休息。
 
 ## 不要踩的地方
@@ -61,5 +64,5 @@
 ## 待使用者決定（截至 2026-10-11）
 - D2 術後那晚 新沙 → 聖水 / 梨大 怎麼走：10/11 起兩頁都寫「叫 Kakao T、不搭地鐵」（路線頁原本把地鐵寫成備案，已對齊安全卡較嚴的說法）。是否要保留地鐵備案、外國遊客能否註冊 Kakao T（各來源說法不一）仍待決定，建議寫成「Kakao T / k.ride / Uber 擇一，出發前先註冊並綁卡」。
 - D5 返程日白天行程（12:00 退房、23:00 班機）還沒訂。**回機場的走法已定**（10/11）：地鐵，梨大 → 2 號線外環 2 站 → 弘大入口換機場鐵路一般列車 → T1，最少轉 1 次（2 號線只在弘大入口接機場鐵路；梨大官網也是這條）。使用者明說**不要機場巴士**，不要再加回去；叫 Kakao T 只當一行備案。
-- apM 20:00 是入場時間還是約會時間。
+- apM 20:00 是入場時間還是約會時間。2026-10-11 查到：頁面上「apM」連結是 HelloAPM 零售（10:30～01:00，週二休），「apM Place」是夜間批發（20:00～05:00，週五、週六休）；D3 是週四，兩個都開。要不要只留一個、20:00 是否改成對應 apM Place 的開門時間，待使用者決定。
 - iPhone 的 Apple Wallet T-money 只收 Mastercard / AmEx / 銀聯（Visa 不行，資料到 2026/4）；用 Visa 的人要買實體 T-money 卡。

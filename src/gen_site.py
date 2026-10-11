@@ -34,6 +34,7 @@ EXTRA2 = '''
     background: var(--surface); color: var(--fg); text-decoration: none; font-size: 14px; }
   .chips a:hover { border-color: var(--accent); }
   .chips .chip { color: var(--muted); border-style: dashed; }
+  .chips .hr { white-space: nowrap; font-style: normal; }
   .legs { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
   .legs table { border-collapse: collapse; width: 100%; min-width: 0; font-size: 13.5px; }
   .legs th, .legs td { text-align: left; padding: 10px 10px; overflow-wrap: anywhere; border-bottom: 1px solid var(--line); vertical-align: top; }
@@ -67,13 +68,18 @@ EXTRA2 = '''
 '''
 
 
+def lbl(name):
+    """chip 文字：跳脫後，把每段「HH:MM～HH:MM」包起來不准在中間斷行（窄螢幕只會在店名／括號／「、」處換行）"""
+    return re.sub(r'(\d{2}:\d{2}～\d{2}:\d{2})', r'<em class="hr">\1</em>', esc(name))
+
+
 def chips(items):
     o = ['<div class="chips">']
     for name, link in items:
         if link:
-            o.append('<a href="%s" target="_blank" rel="noopener">%s</a>' % (esc(link), esc(name)))
+            o.append('<a href="%s" target="_blank" rel="noopener">%s</a>' % (esc(link), lbl(name)))
         else:
-            o.append('<span class="chip">%s</span>' % esc(name))
+            o.append('<span class="chip">%s</span>' % lbl(name))
     o.append('</div>')
     return ''.join(o)
 
@@ -129,6 +135,95 @@ PLACES = {
 }
 
 
+# =============================================================== 營業時間（行程卡的景點一律標成「店名（營業時間）」）
+# 來源：Google 地圖 2026-10-11 的顯示，取「那天是星期幾」的時間：D1 週二、D2 週三、D3 週四、D4 週五（週日起算沒用到，不存）。
+# 值是時間字串，或 (顯示名稱, 時間字串)；時間字串可有多段（午休），None＝Google 地圖沒有營業時間（標「無營業時間資料」，不編造）。
+# 每個 PLACES 景點都必須在這裡有一筆，缺的話 build 會停下來。換日子或換店時要重查 Google 地圖；出發前她們也要再看一次。
+# 行尾註解是 Google 地圖上的店名，用來核對連結點到的是不是同一家。
+HOURS = {
+    ('d1', '豬腳小姐 미쓰족발'): '11:00～03:00',   # 미쓰족발
+    ('d1', '王妃家烤肉 왕비집 總店'): '11:30～22:00',   # Wangbijip Myeongdong Main store
+    ('d1', '樂天百貨本店'): '10:30～20:00',   # LOTTE Department Store Main Store
+    ('d1', '新世界百貨本店'): '10:30～20:00',   # Shinsegae Department Store Main Store
+    ('d1', 'MLB（樂天 7 樓、新世界 5 樓）'): ('MLB', '11:00～22:00'),   # MLB
+    ('d1', 'Nyunyu'): '09:00～23:00',   # nyunyu myeongdong
+    ('d1', '8 seconds'): '10:30～21:00',   # 8秒
+    ('d1', '8 seconds（明洞 8 街）'): ('8 seconds 明洞 8 街', '10:30～22:00'),   # 8seconds
+    ('d1', 'Verish'): '11:00～22:00',   # Verish Myeongdong Flagship Store
+    ('d1', 'Ept'): '10:00～22:00',   # ept Myeongdong
+    ('d1', '新世界免稅店 明洞店'): '10:30～20:00',   # Shinsegae Duty Free Myeongdong
+    ('d1', '南大門市場'): '09:00～17:00',   # Namdaemun Market
+    ('d1', '無垢屋（安國站）'): ('無垢屋 安國站', '11:00～14:00、17:30～20:00'),   # 無垢屋
+    ('d1', '益善洞韓屋村'): '10:00～21:00',   # Ikseon-dong Hanok Village
+    ('d1', '北村韓屋村'): '10:00～17:00',   # Bukchon Hanok Village
+    ('d1', '倫敦貝果博物館 安國店'): '07:00～18:00',   # London Bagel Museum Anguk
+    ('d1', '솔솥 釜飯（益善洞）'): ('솔솥 釜飯 益善洞', '11:00～21:00'),   # Solsot Pot Rice House
+    ('d1', '&meal 三明治（鐘閣）'): ('&meal 三明治 鐘閣', None),   # &meal Sandwich shop (Jonggak)
+    ('d2', '솔솥 釜飯'): '11:30～15:00、17:00～21:00',   # Solsot
+    ('d2', '데이릿 DAYLIT 韓式融合'): '11:30～14:00、17:00～21:00',   # DAYLIT
+    ('d2', "Grandmother's Recipe 韓國菜"): '11:00～21:00',   # Grandmother's Recipe
+    ('d2', '自然島鹽麵包'): '09:00～22:00',   # 自然島鹽可頌 聖水店
+    ('d2', 'Stand oil'): '11:00～20:00',   # STAND OIL
+    ('d2', 'Wacky willy'): '11:00～21:00',   # Wacky WiLLy Seongsu
+    ('d2', 'Tamburins'): '11:00～21:00',   # Tamburins Seongsu
+    ('d2', 'Double lover'): '11:00～21:00',   # DOUBLE LOVERS SEONGSU FLAGSHIP STORE
+    ('d2', 'North face white label'): '11:00～21:00',   # THE NORTHFACE WHITE LABEL SUNGSU
+    ('d2', 'Human made'): '11:00～20:00',   # Human Made Offline Store Seoul
+    ('d2', 'Matin Kim'): '11:00～20:00',   # Matin Kim Seongsu Flagship Store
+    ('d2', 'Satur'): '12:00～20:00',   # Satur
+    ('d2', 'Satur House'): '12:00～20:00',   # 세터하우스 성수 (Satur House)
+    ('d2', 'Atiissu'): '11:00～21:00',   # ATiiSSU HAUS NOWHERE SEOUL
+    ('d2', '祖傳三代馬鈴薯排骨湯（Naver）'): ('祖傳三代馬鈴薯排骨湯', '24 小時'),   # Somunnan Seongsu Gamjatang
+    ('d3', '廣藏市場'): None,   # 廣藏市場
+    ('d3', 'Nyunyu（東大門）'): ('Nyunyu 東大門', '11:00～05:00'),   # Nyunyu Wholesale Dongdaemun
+    ('d3', 'apM（20:00）'): ('apM', '10:30～01:00'),   # HelloAPM
+    ('d3', 'apM Place'): '20:00～05:00',   # Apm Place Shopping Centre
+    ('d3', '東大門 Migliore'): '10:30～02:00',   # The Migliore Dongdaemun branch
+    ('d3', 'DOOTA Mall'): '10:30～24:00',   # DOOTA Mall
+    ('d3', '東大門設計廣場 DDP'): '10:00～20:00',   # Dongdaemun Design Plaza (DDP)
+    ('d3', '新羅免稅店 首爾店'): '09:30～20:00',   # Shilla Duty Free
+    ('d3', '陳玉華奶奶一隻雞'): '10:30～01:00',   # 陳玉華奶奶元祖一隻雞
+    ('d3', 'Hook 烤肉（新堂）'): ('Hook 烤肉 新堂', None),   # Hook說好吃的烤肉
+    ('d3', 'Dapeojwo 海鮮（祭基洞）'): ('Dapeojwo 海鮮 祭基洞', '10:00～22:00'),   # Dapeojwo
+    ('d4', 'KT&G'): '11:00～21:00',   # KT&G想像廣場
+    ('d4', '時空間'): '11:30～22:00',   # 時空間｜弘大分店
+    ('d4', 'Mucent'): '12:00～22:00',   # MUCENT Hongdae Showroom
+    ('d4', 'As”on'): '12:00～21:00',   # ason
+    ('d4', 'Musinsa standard'): '11:00～23:00',   # Musinsa Standard
+    ('d4', 'Covernat'): '12:00～21:00',   # Covernat
+    ('d4', 'SPAO'): '11:00～22:00',   # SPAO 弘大店
+    ('d4', '8 seconds'): '11:00～22:30',   # 8 second
+    ('d4', 'Daiso'): '10:00～22:00',   # 大創 弘大2號店 (Daiso)
+    ('d4', 'AK plaza 二樓 with mu'): '11:00～22:00',   # WithMuu (AK Plaza 2F)
+    ('d4', 'MIXXO（弘大）'): ('MIXXO 弘大', None),   # MIXXO
+    ('d4', 'Chaakan Shoes（弘大）'): ('Chaakan Shoes 弘大', '12:00～22:00'),   # Chaakan Shoes (Hongdae)
+    ('d4', 'Chaakan Shoes（延南）'): ('Chaakan Shoes 延南', '12:00～22:00'),   # Chaakan Shoes Seoul Yeonnam
+    ('d4', '弘大商店街'): '11:00～21:00',   # Hongdae Shopping Street
+    ('d4', 'Daiso（合井一帶）'): ('Daiso 合井一帶', '10:00～22:00'),   # Daiso Hapjeong-dong
+    ('d4', '豚壽百（豬肉湯飯）'): ('豚壽百 豬肉湯飯', '24 小時'),   # Donsubaek
+    ('d4', 'Shin Mi Kyung 辣炒雞'): '11:00～22:30',   # Shin Mi Kyung Hongdae Dakgalbi
+    ('d4', '匠人辣炒雞'): '11:00～01:00',   # Jangin Dakgalbi Hongdae
+    ('d4', 'JO & DAWSON 咖啡'): '10:00～20:00',   # Jo&Dawson
+    ('d4', 'JAMJAM 早午餐'): '10:00～21:00',   # Brunch Cafe JAMJAM
+    ('d4', '1.5floor 咖啡'): '13:00～21:00',   # 1.5floor coffee
+    ('d4', 'git tteul'): '12:00～15:00、16:00～22:40',   # Korean BBQ GIT TTEUL (Hongdae)
+}
+
+
+def _with_hours(day, items):
+    out = []
+    for n, u in items:
+        h = HOURS[(day, n)]
+        if isinstance(h, tuple):
+            n, h = h
+        out.append(('%s（%s）' % (n, h or '無營業時間資料'), u))
+    return out
+
+
+PLACES = {d: {g: _with_hours(d, items) for g, items in groups.items()} for d, groups in PLACES.items()}
+HOURS_NOTE = '括號內是營業時間，Google 地圖 10/11 的顯示（取當天星期幾），出發前再看一次。'
+
+
 def dn(items):
     """路線頁把晚餐也放進 chip 列，標「晚餐：」"""
     return [('晚餐：' + n, u) for n, u in items]
@@ -181,7 +276,7 @@ d1c_segs = [
 d1c_svg = strip(d1c_nodes, d1c_segs, {}, 'D1 晚上：明洞到安國站吃晚餐，再回梨大住宿的路線')
 
 d1 = '<div class="panel-body">' + head('D1', '10/13（二）· 抵達日', '機場 → 明洞 → 安國 → 住宿') + \
-    notes(['凌晨 05:30 落地，百貨 10:30 才開門：早上先去機場汗蒸幕，再出發（見安全卡 D1）。']) + \
+    notes(['凌晨 05:30 落地，百貨 10:30 才開門：早上先去機場汗蒸幕，再出發（見安全卡 D1）。', HOURS_NOTE]) + \
     card(d1a_svg, '去明洞 路線 1：機場 → 梨大（放行李）→ 樂天') + \
     notes([
         '搭「一般列車」才停弘大入口，直通列車不停。',
@@ -192,23 +287,21 @@ d1 = '<div class="panel-body">' + head('D1', '10/13（二）· 抵達日', '機�
     '<h3 class="h3">午餐：二選一</h3>' + \
     chips(PLACES['d1']['lunch']) + \
     notes([
-        '豬腳小姐 <span class="ko">미쓰족발 명동점</span>：乙支路入口站 5／6 號口步行約 3–5 分（估）。每天 11:00–02:00。',
-        '王妃家烤肉 <span class="ko">왕비집 본점</span>（2 樓）：明洞站約 400 m（直線）。每天 11:30–22:00，最後點餐 21:15。',
-        '營業時間查自韓國餐廳網站與部落格，出發前以 Google 地圖當天顯示為準。',
+        '豬腳小姐 <span class="ko">미쓰족발 명동점</span>：乙支路入口站 5／6 號口步行約 3–5 分（估）。',
+        '王妃家烤肉 <span class="ko">왕비집 본점</span>（2 樓）：明洞站約 400 m（直線）。最後點餐 21:15（韓國餐廳網站）。',
     ]) + \
     '<h3 class="h3">明洞可以逛的店</h3>' + \
     chips(PLACES['d1']['shops'] + dn(PLACES['d1']['dinner'])) + \
-    notes(['免稅店購物要帶護照和回程機票資料。']) + \
+    notes(['免稅店購物要帶護照和回程機票資料。', 'MLB 連結是明洞八街的獨立門市；樂天 7 樓、新世界 5 樓也有，營業時間跟百貨一樣。']) + \
     '<h3 class="h3">晚上：安國站晚餐 → 回梨大</h3>' + \
     card(d1c_svg, '樂天旁 → 安國站 → 梨大', False) + \
     notes(['從明洞站去安國站：4 號線北上到忠武路，換 3 號線往大化。']) + \
     '<h3 class="h3">安國一帶可以去的點</h3>' + \
     chips(PLACES['d1']['extra']) + \
     notes([
-        '倫敦貝果博物館 <span class="ko">런던 베이글 뮤지엄</span> 安國店：每天 07:00–18:00，晚餐時段已打烊。',
-        '솔솥 釜飯（益善洞）：每天 11:00–21:00，也可當晚餐選項。',
+        '倫敦貝果博物館 <span class="ko">런던 베이글 뮤지엄</span> 安國店：18:00 就打烊，晚餐時段已關。',
+        '솔솥 釜飯 益善洞：也可當晚餐選項。',
         '&amp;meal 三明治（鐘閣，地下 1 樓）：離安國站約 900 m（直線）。Google 地圖沒有營業時間，出發前先問店家。',
-        '營業時間是 Google 地圖 10/11 的顯示，出發前再看一次。',
     ]) + '</div>'
 
 # =============================================================== D2
@@ -232,21 +325,22 @@ d2_segs = [
 d2_svg = strip(d2_nodes, d2_segs, {}, 'D2 梨大到聖水、新沙，再回聖水吃晚餐後回住宿的路線')
 
 d2 = '<div class="panel-body">' + head('D2', '10/14（三）· 白天聖水，傍晚新沙', '聖水 → 新沙 → 聖水') + \
+    notes([HOURS_NOTE]) + \
     card(d2_svg, '梨大 → 聖水 → 新沙（18:30）→ 聖水晚餐 → 梨大（新沙之後，術後那晚改叫車）') + \
     '<h3 class="h3">午餐：三選一</h3>' + \
     chips(PLACES['d2']['lunch']) + \
     notes([
-        '솔솥 釜飯 <span class="ko">솔솥 성수점</span>：聖水站 3 號口步行約 5 分。11:30–21:00，最後點餐 20:20；平日午餐最後點餐 14:20，之後休息。',
-        '데이릿 <span class="ko">DAYLIT</span>（B1）：纛島站 <span class="ko">뚝섬</span>（聖水前一站）步行約 3–5 分。11:30–21:30，最後點餐 20:30；平日 14:30–17:00 休息。',
-        "Grandmother's Recipe（韓國菜）：在 데이릿 往西約 400 m（直線）。週二至週日 11:00–21:00（Google 地圖 10/11）。",
-        '10/14 是週三，솔솥、데이릿下午休息，午餐請在 14:00 前到。솔솥和 데이릿的時間查自韓國餐廳網站與部落格，出發前以 Google 地圖當天顯示為準。',
+        '솔솥 釜飯 <span class="ko">솔솥 성수점</span>：聖水站 3 號口步行約 5 分。最後點餐 20:20；平日午餐最後點餐 14:20（韓國餐廳網站，出發前再確認）。',
+        '데이릿 <span class="ko">DAYLIT</span>（B1）：纛島站 <span class="ko">뚝섬</span>（聖水前一站）步行約 3–5 分。',
+        "Grandmother's Recipe（韓國菜）：在 데이릿 往西約 400 m（直線）。",
+        '10/14 是週三，솔솥、데이릿下午休息，午餐請在 14:00 前到。',
     ]) + \
     '<h3 class="h3">聖水可以逛的店</h3>' + \
     chips(PLACES['d2']['shops']) + \
     '<h3 class="h3">傍晚與晚上</h3>' + \
     chips([('18:30 新沙站 3 號口', U + 'qEQWciBaK3x2ujDh6')] + dn(PLACES['d2']['dinner'])) + \
     notes([
-        '排骨湯店 <span class="ko">소문난 성수 감자탕</span>：聖水站 4 號口外約 240 m，24 小時營業。',
+        '排骨湯店 <span class="ko">소문난 성수 감자탕</span>：聖水站 4 號口外約 240 m。連結是 Naver 地圖。',
         '術後那晚不搭地鐵（見安全卡 D2）：離開診所後直接叫 Kakao T，去聖水吃晚餐、再回梨大都叫車，上車前把車牌傳給家人。圖上新沙之後的地鐵路線只是平常的走法。',
     ], 'note warn') + '</div>'
 
@@ -265,13 +359,15 @@ d3_segs = [
 d3_svg = strip(d3_nodes, d3_segs, {}, 'D3 梨大到東大門一帶再回住宿的路線')
 
 d3 = '<div class="panel-body">' + head('D3', '10/15（四）· 光藏、東大門', '東大門一帶') + \
+    notes([HOURS_NOTE]) + \
     card(d3_svg, '梨大 → 乙支路4街 → 東大門歷史文化公園 → 梨大') + \
     '<h3 class="h3">東大門可以逛的店</h3>' + \
     chips(PLACES['d3']['shops'] + dn(PLACES['d3']['dinner'])) + \
     notes([
         '新羅免稅店在東國大學一帶，離東大門歷史文化公園約 1 km（直線）；免稅店要帶護照和回程機票資料。',
-        'Hook 烤肉：新堂站（東大門歷史文化公園的下一站）附近。Google 地圖沒有營業時間，出發前先問店家。',
-        'Dapeojwo 海鮮：在祭基洞，離東大門歷史文化公園約 3 km（直線），要多搭一段。每天 10:00–22:00，週三休息（D3 是週四）。',
+        '廣藏市場、Hook 烤肉：Google 地圖沒有營業時間，出發前先問店家。Hook 在新堂站（東大門歷史文化公園的下一站）附近。',
+        'Dapeojwo 海鮮：在祭基洞，離東大門歷史文化公園約 3 km（直線），要多搭一段。週三休息（D3 是週四）。',
+        'apM 有兩個連結：「apM」是 HelloAPM（白天營業，週二公休）；「apM Place」是 20:00 才開的夜間批發（週五、週六公休）。',
     ]) + \
     notes(['apM 20:00 後結束較晚，趕不上地鐵末班就叫 Kakao T。'], 'note warn') + '</div>'
 
@@ -290,20 +386,13 @@ d4_segs = [
 d4_svg = strip(d4_nodes, d4_segs, {}, 'D4 梨大到弘大再從合井回住宿的路線')
 
 d4 = '<div class="panel-body">' + head('D4', '10/16（五）· 弘大', '弘大 → 合井') + \
+    notes([HOURS_NOTE]) + \
     card(d4_svg, '梨大 → 弘益大學 → 合井 → 梨大') + \
     '<h3 class="h3">弘大可以逛的店</h3>' + \
     chips(PLACES['d4']['shops'] + dn(PLACES['d4']['dinner'])) + \
     '<h3 class="h3">吃的與咖啡</h3>' + \
     chips(PLACES['d4']['food']) + \
-    notes([
-        '豚壽百 弘大直營店（豬肉湯飯）：24 小時營業。',
-        'Shin Mi Kyung 辣炒雞：每天 11:00–22:30。',
-        '匠人辣炒雞：每天 11:00–01:00。',
-        'JO &amp; DAWSON（咖啡）：每天 10:00–20:00。',
-        'Brunch Cafe JAMJAM（早午餐）：週一至週五 10:00–21:00，週末到 22:00。',
-        '1.5floor coffee（延南洞）：每天 13:00–21:00。',
-        '營業時間是 Google 地圖 10/11 的顯示，出發前再看一次。',
-    ]) + \
+    notes(['MIXXO（弘大）：Google 地圖沒有營業時間，出發前先看店家資訊。']) + \
     notes([
         '週五晚上弘大人多，不理會搭訕與拉客，不停留。',
         '晚餐後直接回住處，或叫 Kakao T。',
@@ -520,10 +609,12 @@ for _id in ['emergency', 'flights', 'days', 'safety', 'checklist']:
 sub('Ever8 Serviced Residence（新村）', 'Ever8 Serviced Residence（梨大站旁）')
 sub('首爾地鐵 2 號線新村站，步行約 10 分鐘內 · 每晚入住', '首爾地鐵 2 號線梨大站（241）1 號口，步行約 314 m（Naver Map） · 每晚入住')
 sub('回新村一律叫 Kakao T', '回梨大住處一律叫 Kakao T')
-sub('<dd>祖傳三代馬鈴薯排骨湯</dd>', '<dd>祖傳三代馬鈴薯排骨湯（聖水站旁，診所結束後）</dd>')
+sub('<dd>祖傳三代馬鈴薯排骨湯</dd>', '<dd>%s，聖水站旁，診所結束後</dd>' % PLACES['d2']['dinner'][0][0])
 sub('弘大到新村只有一小段', '弘大到梨大只有一小段')
 sub('新沙站 3 號口（閨蜜雙眼皮手術）', '新沙站 3 號口（雙眼皮手術）')
 sub('<dd>APM</dd>', '<dd>apM</dd>')
+sub('<p class="section-note">標籤是夜間與人潮的留意程度，不代表該區域危險。</p>',
+    '<p class="section-note">標籤是夜間與人潮的留意程度，不代表該區域危險。地點括號內是營業時間，Google 地圖 10/11 的顯示（取當天星期幾），出發前再看一次。</p>')
 sub('<li>去機場可搭機場鐵路（AREX，弘大入口站可上車），班次與時間出發前再確認。</li>',
     '<li>去機場：梨大站搭 2 號線外環 2 站到弘大入口，換機場鐵路一般列車直達 T1，只轉 1 次。班次與時間出發前再確認。</li>')
 
@@ -547,12 +638,12 @@ SHOT_CSS = '''
   .shot img { display: block; width: 100%; height: auto; background: #fff; }
   @media (prefers-reduced-motion: reduce) { .shot .chev { transition: none; } }
 '''
-s_css = s_css + SHOT_CSS
+s_css = s_css + SHOT_CSS + '\n  .hr { white-space: nowrap; font-style: normal; }\n'
 
 
 def _srow(label, items):
     """安全卡一列：左邊標籤，右邊一排 chip（只列名字；連結與營業時間在路線頁）"""
-    chips_html = ''.join('<span class="chip">%s</span>' % esc(re.sub(r'（Naver）$', '', n)) for n, _ in items)
+    chips_html = ''.join('<span class="chip">%s</span>' % lbl(re.sub(r'（Naver）$', '', n)) for n, _ in items)
     return '<div class="row"><dt>%s</dt><dd><div class="chips">%s</div></dd></div>' % (label, chips_html)
 
 
