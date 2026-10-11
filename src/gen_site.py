@@ -310,11 +310,28 @@ d4 = '<div class="panel-body">' + head('D4', '10/16（五）· 弘大', '弘大 
         '飲料不離身，不接受陌生人的飲品或食物。',
     ], 'note warn') + '</div>'
 
+# 回機場：梨大站只在 2 號線，2 號線和機場鐵路只在弘大入口相連 → 地鐵最少轉 1 次（梨大官網的說法也是這條）
+d5_nodes = [
+    HOME,
+    {'n': '弘大入口 239', 's': '홍대입구 · 換機場鐵路', 'hub': True},
+    {'n': '仁川機場 T1', 's': '인천공항 1터미널'},
+]
+d5_segs = [
+    {'line': 'l2', 'text': '2 號線外環（往新村、弘大方向，2 站）'},
+    {'line': 'arex', 'text': '機場鐵路一般列車（往仁川機場）'},
+]
+d5_svg = strip(d5_nodes, d5_segs, {}, 'D5 回機場：梨大站經弘大入口換機場鐵路到仁川機場 T1 的路線')
+
 d5 = ('<div class="panel-body"><header class="dayhead"><span class="day-no off">D5</span><div><h2>返程日</h2>'
       '<p class="section-note">10/17（六）</p></div></header>'
       '<p class="sum">行程還沒訂。固定：12:00 退房、23:00 仁川機場 T1 起飛。</p>'
-      + notes(['退房後到出發前有 7 到 8 小時，先問公寓能不能寄放行李。建議 ~18:00 離開市區、~19:30 抵達仁川 T1，留時間退稅與託運（見安全卡 D5）。',
-               '去機場：梨大站搭 2 號線外環到弘大入口，換機場鐵路一般列車，T1 下車。'], 'note') + '</div>')
+      + notes(['退房後到出發前有 7 到 8 小時，先問公寓能不能寄放行李。建議 ~18:00 離開市區、~19:30 抵達仁川 T1，留時間退稅與託運（見安全卡 D5）。'], 'note')
+      + card(d5_svg, '回機場：梨大 → 弘大入口（換乘）→ 仁川機場 T1')
+      + notes([
+          '2 號線不到機場，只有弘大入口接機場鐵路，所以地鐵最少轉 1 次；換乘後直達 T1，不用再轉。',
+          '搭「一般列車」才停弘大入口，直通列車不停。T1 在 T2 前一站，T1 下車。',
+          '行李太多或趕時間：叫 Kakao T 直達 T1。',
+      ], 'note') + '</div>')
 
 # =============================================================== overview
 legs = '''<section id="legs"><h2>每天怎麼走</h2>
@@ -326,7 +343,7 @@ legs = '''<section id="legs"><h2>每天怎麼走</h2>
 <tr><td class="d">D2</td><td>梨大 → 聖水 211 5 號口<br>2 號線內環<br>傍晚：新沙 337 3 號口</td><td>聖水 211 4 號口<br>2 號線外環</td></tr>
 <tr><td class="d">D3</td><td>梨大 → 乙支路4街 204 4 號口<br>2 號線內環</td><td>東大門歷史文化公園 205 2 號口<br>2 號線外環</td></tr>
 <tr><td class="d">D4</td><td>梨大 → 弘益大學 239 4 號口<br>2 號線外環</td><td>合井 238 3 號口<br>2 號線內環</td></tr>
-<tr><td class="d">D5</td><td>還沒訂</td><td>機場：梨大 → 弘大入口（外環）換機場鐵路</td></tr>
+<tr><td class="d">D5</td><td>還沒訂</td><td>機場：梨大 → 弘大入口（外環，2 站）換機場鐵路一般列車，只轉 1 次</td></tr>
 </tbody></table></div></section>'''
 guide = '''<section id="guide"><h2>怎麼認方向</h2><div class="guide"><ul>
 <li><b>2 號線是環狀線</b>，月台認「內環 <span class="ko">내선순환</span>／外環 <span class="ko">외선순환</span>」，不看終點站。</li>
@@ -507,6 +524,8 @@ sub('<dd>祖傳三代馬鈴薯排骨湯</dd>', '<dd>祖傳三代馬鈴薯排骨�
 sub('弘大到新村只有一小段', '弘大到梨大只有一小段')
 sub('新沙站 3 號口（閨蜜雙眼皮手術）', '新沙站 3 號口（雙眼皮手術）')
 sub('<dd>APM</dd>', '<dd>apM</dd>')
+sub('<li>去機場可搭機場鐵路（AREX，弘大入口站可上車），班次與時間出發前再確認。</li>',
+    '<li>去機場：梨大站搭 2 號線外環 2 站到弘大入口，換機場鐵路一般列車直達 T1，只轉 1 次。班次與時間出發前再確認。</li>')
 
 # 航班區塊下面的「航班截圖」展開列（圖檔 src/flights.jpg 是訂票 App 的行程截圖，只有航線與時間，沒有姓名／訂位代號）
 SHOT_HTML = '''    <details class="shot">
@@ -695,6 +714,9 @@ shell = shell.replace('標「估」的步行與搭車分鐘數，是我依站數
                       '路線圖是示意，不是真實地圖；搭乘方向以月台上的內環／外環標示為準，班次、時間與實際走法請當天用 Naver Map 或 Kakao Map 確認。')
 shell = shell.replace('open(SP + \'seoul-routes.html\'', 'open(SP + \'seoul-routes.html\'')
 shell = re.sub(r'    <li><a href="[^"]*(travel-stained|blog/3196|shilladfs)[^"]*"[^\n]*</li>\n', '', shell)
+_ewha_src = '    <li>樂天百貨明洞本店官網「機場交通方式」頁（你提供的截圖）</li>'
+assert shell.count(_ewha_src) == 1
+shell = shell.replace(_ewha_src, _ewha_src + '\n    <li><a href="https://ewha.ac.kr/ewhaen/intro/location.do" target="_blank" rel="noopener">梨花女子大學「交通」頁（機場到梨大：機場鐵路換 2 號線）</a></li>')
 shell = re.sub(r"<footer>\n  <p>.*?</p>\n  <ul>", "<footer>\n  <p>路線圖是示意，不是真實地圖。方向以月台的內環／外環標示為準。</p>\n  <details><summary>資料來源</summary>\n  <ul>", shell, flags=re.S)
 assert '<details>' in shell
 shell = shell.replace("  </ul>\n</footer>", "  </ul>\n  </details>\n</footer>")
