@@ -104,8 +104,7 @@ PLACES = {
                   ('&meal 三明治（鐘閣）', gcid(11699278285228278577))],
     },
     'd2': {
-        'lunch': [('솔솥 釜飯', U + 'bBeP8iwVV3Q9sXoj7'), ('데이릿 DAYLIT 韓式融合', U + 'sd923JjcAAgWYvGKA'),
-                  ("Grandmother's Recipe 韓國菜", gcid(496188655814551911))],
+        'lunch': [('솔솥 釜飯', U + 'bBeP8iwVV3Q9sXoj7')],                 # 10/11 她們決定吃釜飯（原本還有 DAYLIT、Grandmother's Recipe）
         'shops': [('自然島鹽麵包', U + 'R3Hcxf3a5gEijn6G8'), ('Stand oil', U + 'ouAPx7aC1JFmtcfm7'), ('Wacky willy', U + 'tMkUdDnRnLL5ENer7'),
                   ('Tamburins', U + '95G1crrtgBN1NNnz6'), ('Double lover', U + '1huZgn8fiqcspLRm9'), ('North face white label', U + 'Wu689jQxZAEWQWEE8'),
                   ('Human made', U + 'BJ9evkFt8McrFXb46'), ('Matin Kim', U + 'mXJjBfoqddtBuRTf6'), ('Satur', U + 'MShBWdqorQ8BnkHX7'),
@@ -160,8 +159,6 @@ HOURS = {
     ('d1', '솔솥 釜飯（益善洞）'): ('솔솥 釜飯 益善洞', '11:00～21:00'),   # Solsot Pot Rice House
     ('d1', '&meal 三明治（鐘閣）'): ('&meal 三明治 鐘閣', None),   # &meal Sandwich shop (Jonggak)
     ('d2', '솔솥 釜飯'): '11:30～15:00、17:00～21:00',   # Solsot
-    ('d2', '데이릿 DAYLIT 韓式融合'): '11:30～14:00、17:00～21:00',   # DAYLIT
-    ('d2', "Grandmother's Recipe 韓國菜"): '11:00～21:00',   # Grandmother's Recipe
     ('d2', '自然島鹽麵包'): '09:00～22:00',   # 自然島鹽可頌 聖水店
     ('d2', 'Stand oil'): '11:00～20:00',   # STAND OIL
     ('d2', 'Wacky willy'): '11:00～21:00',   # Wacky WiLLy Seongsu
@@ -327,13 +324,11 @@ d2_svg = strip(d2_nodes, d2_segs, {}, 'D2 梨大到聖水、新沙，再回聖�
 d2 = '<div class="panel-body">' + head('D2', '10/14（三）· 白天聖水，傍晚新沙', '聖水 → 新沙 → 聖水') + \
     notes([HOURS_NOTE]) + \
     card(d2_svg, '梨大 → 聖水 → 新沙（18:30）→ 聖水晚餐 → 梨大（新沙之後，術後那晚改叫車）') + \
-    '<h3 class="h3">午餐：三選一</h3>' + \
+    '<h3 class="h3">午餐：釜飯</h3>' + \
     chips(PLACES['d2']['lunch']) + \
     notes([
-        '솔솥 釜飯 <span class="ko">솔솥 성수점</span>：聖水站 3 號口步行約 5 分。最後點餐 20:20；平日午餐最後點餐 14:20（韓國餐廳網站，出發前再確認）。',
-        '데이릿 <span class="ko">DAYLIT</span>（B1）：纛島站 <span class="ko">뚝섬</span>（聖水前一站）步行約 3–5 分。',
-        "Grandmother's Recipe（韓國菜）：在 데이릿 往西約 400 m（直線）。",
-        '10/14 是週三，솔솥、데이릿下午休息，午餐請在 14:00 前到。',
+        '솔솥 釜飯 <span class="ko">솔솥 성수점</span>：聖水站 3 號口步行約 5 分。平日午餐最後點餐 14:20（韓國餐廳網站，出發前再確認）。',
+        '10/14 是週三，솔솥下午休息，午餐請在 14:00 前到。',
     ]) + \
     '<h3 class="h3">聖水可以逛的店</h3>' + \
     chips(PLACES['d2']['shops']) + \
