@@ -87,7 +87,7 @@ def chips(items):
 HOME = {'n': '梨大站 241', 's': '이대 · 住宿 · 1 號口'}
 
 # =============================================================== 每天的地點清單（路線頁與安全卡的「每日行程」共用這一份）
-# 改地點只改這裡：路線頁的 chip 與安全卡每天的 午餐／白天／吃喝／晚餐 列都從這份產生，兩邊不會再各改各的。
+# 改地點只改這裡：路線頁的 chip 與安全卡每天的 午餐／白天／午餐備選／咖啡廳／晚餐 列都從這份產生，兩邊不會再各改各的。
 # 營業時間、步行距離等說明仍寫在各天路線頁的 notes 裡（安全卡只列名字）。
 PLACES = {
     'd1': {
@@ -127,9 +127,9 @@ PLACES = {
                   ('AK plaza 二樓 with mu', U + 'Z8uqkKtWWFrxWdLj6'), ('MIXXO（弘大）', U + 'z6yQ1R6zEwA4fWaZ9'),
                   ('Chaakan Shoes（弘大）', gcid(2331305143891035196)), ('Chaakan Shoes（延南）', gcid(3388213180839182877)),
                   ('弘大商店街', gcid(14349369460367289050)), ('Daiso（合井一帶）', gcid(7598751900615994774))],
-        'food': [('豚壽百（豬肉湯飯）', gcid(8654896397275182277)), ('Shin Mi Kyung 辣炒雞', gcid(4425035991011461468)),
-                 ('匠人辣炒雞', gcid(13348765074285808277)), ('JO & DAWSON 咖啡', gcid(13213580688860194156)),
-                 ('JAMJAM 早午餐', gcid(6568848292499483586)), ('1.5floor 咖啡', gcid(4920152743334876284))],
+        'lunch_alt': [('豚壽百（豬肉湯飯）', gcid(8654896397275182277)), ('Shin Mi Kyung 辣炒雞', gcid(4425035991011461468)),
+                      ('匠人辣炒雞', gcid(13348765074285808277)), ('JAMJAM 早午餐', gcid(6568848292499483586))],
+        'cafe': [('JO & DAWSON 咖啡', gcid(13213580688860194156)), ('1.5floor 咖啡', gcid(4920152743334876284))],
         'dinner': [('git tteul', U + 'MRquskwWVFFVvDfZ7')],
     },
 }
@@ -396,9 +396,11 @@ d4 = '<div class="panel-body">' + head('D4', '10/16（五）· 弘大', '弘大 
     card(d4_svg, '梨大 → 弘益大學 → 合井 → 梨大') + \
     '<h3 class="h3">弘大可以逛的店</h3>' + \
     chips(PLACES['d4']['shops'] + dn(PLACES['d4']['dinner'])) + \
-    '<h3 class="h3">吃的與咖啡</h3>' + \
-    chips(PLACES['d4']['food']) + \
     notes(['MIXXO（弘大）：Google 地圖沒有營業時間，出發前先看店家資訊。']) + \
+    '<h3 class="h3">午餐備選</h3>' + \
+    chips(PLACES['d4']['lunch_alt']) + \
+    '<h3 class="h3">咖啡廳</h3>' + \
+    chips(PLACES['d4']['cafe']) + \
     notes([
         '週五晚上弘大人多，不理會搭訕與拉客，不停留。',
         '晚餐後直接回住處，或叫 Kakao T。',
@@ -669,7 +671,7 @@ _swap_row('D1', '晚餐', _srow('晚餐', PLACES['d1']['dinner']) + _srow('安�
 _swap_row('D2', '白天', _srow('午餐', PLACES['d2']['lunch']) + _srow('白天', PLACES['d2']['shops']))
 _swap_row('D3', '白天', _srow('午餐', PLACES['d3']['lunch']) + _srow('白天', PLACES['d3']['shops']))
 _swap_row('D3', '晚餐', _srow('晚餐', PLACES['d3']['dinner']))
-_swap_row('D4', '白天', _srow('白天', PLACES['d4']['shops']) + _srow('吃喝', PLACES['d4']['food']))
+_swap_row('D4', '白天', _srow('白天', PLACES['d4']['shops']) + _srow('午餐備選', PLACES['d4']['lunch_alt']) + _srow('咖啡廳', PLACES['d4']['cafe']))
 _swap_row('D4', '晚餐', _srow('晚餐', PLACES['d4']['dinner']))
 DOCS = """<h3 class="group-title">證件與護照</h3>
     <div class="card">
