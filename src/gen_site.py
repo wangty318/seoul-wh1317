@@ -91,8 +91,8 @@ HOME = {'n': '梨大站 241', 's': '이대 · 住宿 · 1 號口'}
 # 營業時間、步行距離等說明仍寫在各天路線頁的 notes 裡（安全卡只列名字）。
 PLACES = {
     'd1': {
-        'lunch': [('豬腳小姐 미쓰족발', gmap('미쓰족발 명동점 서울 중구 명동3길 21')),
-                  ('王妃家烤肉 왕비집 總店', gmap('왕비집 명동 본점 서울 중구 명동8가길 26'))],
+        'lunch': [('豬腳小姐 미쓰족발', gmap('미쓰족발 명동점 서울 중구 명동3길 21'))],      # 10/12 暫定吃豬腳
+        'lunch_alt': [('王妃家烤肉 왕비집 總店', gmap('왕비집 명동 본점 서울 중구 명동8가길 26'))],   # 備案
         'shops': [('樂天百貨本店', gmap('서울 중구 남대문로 81 롯데백화점 본점')), ('新世界百貨本店', gmap('서울 중구 소공로 63 신세계백화점 본점')),
                   ('MLB（樂天 7 樓、新世界 5 樓）', U + 'jYVbCYTKA5ULYVoK9'), ('Nyunyu', U + 'h9xBKiUNi3y75kBo9'),
                   ('8 seconds', U + 'u3pLv2hvKXbHjQtQ6'), ('8 seconds（明洞 8 街）', gcid(12288299774777914104)),
@@ -283,10 +283,14 @@ d1 = '<div class="panel-body">' + head('D1', '10/13（二）· 抵達日', '機�
     ]) + \
     card(d1b_svg, '路線 2（不放行李）：機場 → 首爾站 → 明洞', False) + \
     notes(['直通列車直達首爾站，轉 4 號線要走一段，帶行李較累。']) + \
-    '<h3 class="h3">午餐：二選一</h3>' + \
+    '<h3 class="h3">午餐暫定</h3>' + \
     chips(PLACES['d1']['lunch']) + \
     notes([
         '豬腳小姐 <span class="ko">미쓰족발 명동점</span>：乙支路入口站 5／6 號口步行約 3–5 分（估）。',
+    ]) + \
+    '<h3 class="h3">午餐備案</h3>' + \
+    chips(PLACES['d1']['lunch_alt']) + \
+    notes([
         '王妃家烤肉 <span class="ko">왕비집 본점</span>（2 樓）：明洞站約 400 m（直線）。最後點餐 21:15（韓國餐廳網站）。',
     ]) + \
     '<h3 class="h3">明洞可以逛的店</h3>' + \
@@ -660,7 +664,7 @@ def _swap_row(day_no, dt, new_rows):
     s_body = s_body[:a] + pat.sub(lambda m: new_rows, seg) + s_body[b:]
 
 
-_swap_row('D1', '白天', _srow('午餐', PLACES['d1']['lunch']) + _srow('白天', PLACES['d1']['shops']))
+_swap_row('D1', '白天', _srow('午餐暫定', PLACES['d1']['lunch']) + _srow('午餐備案', PLACES['d1']['lunch_alt']) + _srow('白天', PLACES['d1']['shops']))
 _swap_row('D1', '晚餐', _srow('晚餐', PLACES['d1']['dinner']) + _srow('安國一帶', PLACES['d1']['extra']))
 _swap_row('D2', '白天', _srow('午餐', PLACES['d2']['lunch']) + _srow('白天', PLACES['d2']['shops']))
 _swap_row('D3', '白天', _srow('午餐', PLACES['d3']['lunch']) + _srow('白天', PLACES['d3']['shops']))
