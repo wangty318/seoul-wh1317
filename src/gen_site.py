@@ -132,6 +132,9 @@ PLACES = {
         'cafe': [('JO & DAWSON 咖啡', gcid(13213580688860194156)), ('1.5floor 咖啡', gcid(4920152743334876284))],
         'dinner': [('git tteul', U + 'MRquskwWVFFVvDfZ7')],
     },
+    'd5': {
+        'outlet': [('驪州 Premium Outlets', gcid(2261869269338785962))],      # 10/12 使用者指定：Klook 接駁車去 outlet
+    },
 }
 
 
@@ -141,6 +144,7 @@ PLACES = {
 # 每個 PLACES 景點都必須在這裡有一筆，缺的話 build 會停下來。換日子或換店時要重查 Google 地圖；出發前她們也要再看一次。
 # 行尾註解是 Google 地圖上的店名，用來核對連結點到的是不是同一家。
 HOURS = {
+    ('d5', '驪州 Premium Outlets'): '10:30～21:00',   # 驪州 Yeoju Premium Outlets（週六 10:30–21:00；週一到四是 10:30–20:30）
     ('d1', '豬腳小姐 미쓰족발'): '11:00～03:00',   # 미쓰족발
     ('d1', '王妃家烤肉 왕비집 總店'): '11:30～22:00',   # Wangbijip Myeongdong Main store
     ('d1', '樂天百貨本店'): '10:30～20:00',   # LOTTE Department Store Main Store
@@ -407,27 +411,46 @@ d4 = '<div class="panel-body">' + head('D4', '10/16（五）· 弘大', '弘大 
         '飲料不離身，不接受陌生人的飲品或食物。',
     ], 'note warn') + '</div>'
 
-# 回機場：梨大站只在 2 號線，2 號線和機場鐵路只在弘大入口相連 → 地鐵最少轉 1 次（梨大官網的說法也是這條）
+# D5：早上退房 → 弘益大學站寄放行李 → 4 號口搭 Klook 接駁車去驪州 Premium Outlets → 18:30 回弘益大學站取行李 → 機場鐵路（A 線）一般列車到 T1
+# 接駁車時間是 Klook 商品頁寫的（191022：08:30 弘益大學站 4 號出口 AK Plaza 集合、outlet 10:30–17:00、18:30 弘益大學站下車），實際以訂票確認信為準。
+# 弘益大學站置物櫃：Creatrip 部落格與 my-luggage 彙整頁都寫站內櫃 05:00–24:00（機場鐵路 B2 的 3、4 號口附近、2 號線 2／8 號口附近）；首爾市 2019 年的介紹是基本 4 小時、超過加價。
+KLOOK = 'https://www.klook.com/zh-TW/activity/191022-yeoju-premium-outlets-shuttle-bus-from-seoul/'
 d5_nodes = [
     HOME,
-    {'n': '弘大入口 239', 's': '홍대입구 · 換機場鐵路', 'hub': True},
+    {'n': '弘益大學站 239', 's': '홍대입구 · 寄放行李 · 08:30', 'hub': True},
+    {'n': '驪州 Premium Outlets', 's': '여주 · 10:30–17:00'},
+    {'n': '弘益大學站 239', 's': '홍대입구 · 取行李 · 18:30', 'hub': True},
     {'n': '仁川機場 T1', 's': '인천공항 1터미널'},
 ]
 d5_segs = [
     {'line': 'l2', 'text': '2 號線外環（往新村、弘大方向，2 站）'},
+    {'line': 'walk', 'text': '接駁車（Klook）'},
+    {'line': 'walk', 'text': '接駁車回程（Klook）'},
     {'line': 'arex', 'text': '機場鐵路一般列車（往仁川機場）'},
 ]
-d5_svg = strip(d5_nodes, d5_segs, {}, 'D5 回機場：梨大站經弘大入口換機場鐵路到仁川機場 T1 的路線')
+d5_svg = strip(d5_nodes, d5_segs, {}, 'D5 梨大到弘益大學站寄放行李，搭接駁車去驪州 Premium Outlets，回來取行李後搭機場鐵路到仁川機場 T1 的路線')
 
 d5 = ('<div class="panel-body"><header class="dayhead"><span class="day-no off">D5</span><div><h2>返程日</h2>'
       '<p class="section-note">10/17（六）</p></div></header>'
-      '<p class="sum">行程還沒訂。固定：12:00 退房、23:00 仁川機場 T1 起飛。</p>'
-      + notes(['退房後到出發前有 7 到 8 小時，先問公寓能不能寄放行李。建議 ~18:00 離開市區、~19:30 抵達仁川 T1，留時間退稅與託運（見安全卡 D5）。'], 'note')
-      + card(d5_svg, '回機場：梨大 → 弘大入口（換乘）→ 仁川機場 T1')
+      '<p class="sum">23:00 仁川機場 T1 起飛。白天去驪州 Premium Outlets（Klook 接駁車），行李先寄放弘益大學站。</p>'
+      + notes(['08:30 在弘益大學站 4 號口集合，所以早上退房後直接出發（退房最晚 12:00），先寄放行李。梨大到弘益大學站 2 站，建議 07:45 前離開公寓。'], 'note')
+      + card(d5_svg, '梨大 → 弘益大學站（寄放行李）→ 驪州 Premium Outlets → 弘益大學站（取行李）→ 仁川機場 T1')
+      + '<h3 class="h3">寄放行李：弘益大學站</h3>'
       + notes([
-          '2 號線不到機場，只有弘大入口接機場鐵路，所以地鐵最少轉 1 次；換乘後直達 T1，不用再轉。',
-          '搭「一般列車」才停弘大入口，直通列車不停。T1 在 T2 前一站，T1 下車。',
-          '行李太多或趕時間：叫 Kakao T 直達 T1。',
+          '站內有置物櫃，05:00～24:00 可用：機場鐵路 B2 的 3、4 號口附近、2 號線 2／8 號口附近。早上寄、晚上取都來得及。',
+          '機台刷卡付費，以 4 小時為單位、超過加價。客滿的備案：9 號口方向的 Yellow 置物櫃（07:00～23:00）。位置與價格出自部落格與首爾市 2019 年的介紹，現場以機台為準。',
+      ], 'note')
+      + '<h3 class="h3">驪州 Premium Outlets</h3>'
+      + chips(PLACES['d5']['outlet'] + [('Klook 接駁車（訂票頁）', KLOOK)])
+      + notes([
+          HOURS_NOTE,
+          '接駁車：08:30 弘益大學站 4 號口（AK Plaza）集合；outlet 10:30～17:00 自由活動；18:30 回到弘益大學站。以上是 Klook 商品頁寫的，實際以訂票後的確認信為準（出發前一天 17:00 前寄到信箱）。',
+          '24 小時前可免費取消。塞車可能晚回，有旅客評價寫 19:10 才回到首爾。',
+      ], 'note')
+      + '<h3 class="h3">回機場</h3>'
+      + notes([
+          '取行李後在弘益大學站搭機場鐵路（A 線）一般列車，直達 T1，不用轉乘；直通列車不停弘益大學站。T1 在 T2 前一站，T1 下車。',
+          '預計 ~20:00 抵達 T1（接駁車準時的話，估）。行李太多或趕時間：叫 Kakao T 直達 T1。',
       ], 'note') + '</div>')
 
 # =============================================================== overview
@@ -440,7 +463,7 @@ legs = '''<section id="legs"><h2>每天怎麼走</h2>
 <tr><td class="d">D2</td><td>梨大 → 聖水 211 5 號口<br>2 號線內環<br>傍晚：新沙 337 3 號口</td><td>聖水 211 4 號口<br>2 號線外環</td></tr>
 <tr><td class="d">D3</td><td>梨大 → 乙支路4街 204 4 號口<br>2 號線內環</td><td>東大門歷史文化公園 205 2 號口<br>2 號線外環</td></tr>
 <tr><td class="d">D4</td><td>梨大 → 弘益大學 239 4 號口<br>2 號線外環</td><td>合井 238 3 號口<br>2 號線內環</td></tr>
-<tr><td class="d">D5</td><td>還沒訂</td><td>機場：梨大 → 弘大入口（外環，2 站）換機場鐵路一般列車，只轉 1 次</td></tr>
+<tr><td class="d">D5</td><td>梨大 → 弘益大學 239 4 號口<br>2 號線外環（2 站）<br>寄放行李 → 08:30 接駁車去驪州 Outlet</td><td>18:30 回弘益大學站取行李<br>機場鐵路一般列車 → 仁川機場 T1</td></tr>
 </tbody></table></div></section>'''
 guide = '''<section id="guide"><h2>怎麼認方向</h2><div class="guide"><ul>
 <li><b>2 號線是環狀線</b>，月台認「內環 <span class="ko">내선순환</span>／外環 <span class="ko">외선순환</span>」，不看終點站。</li>
@@ -624,7 +647,19 @@ sub('<dd>APM</dd>', '<dd>apM</dd>')
 sub('<p class="section-note">標籤是夜間與人潮的留意程度，不代表該區域危險。</p>',
     '<p class="section-note">標籤是夜間與人潮的留意程度，不代表該區域危險。地點括號內是營業時間，Google 地圖 10/11 的顯示（取當天星期幾），出發前再看一次。</p>')
 sub('<li>去機場可搭機場鐵路（AREX，弘大入口站可上車），班次與時間出發前再確認。</li>',
-    '<li>去機場：梨大站搭 2 號線外環 2 站到弘大入口，換機場鐵路一般列車直達 T1，只轉 1 次。班次與時間出發前再確認。</li>')
+    '<li>接駁車（Klook）要先訂好，24 小時前可免費取消；最終集合資訊會在前一天 17:00 前寄到信箱，塞車可能晚回。</li>\n'
+    '          <li>去機場：弘益大學站搭機場鐵路一般列車直達 T1，不用轉乘。班次與時間出發前再確認。</li>')
+sub('<li>退房後到出發前有 7 到 8 小時，先問公寓能否寄放行李，免得全天拖著走。</li>',
+    '<li>行李寄放在弘益大學站內的置物櫃（05:00～24:00），機台刷卡付費；客滿就看 9 號口方向的 Yellow 置物櫃。</li>')
+sub('<div class="row"><dt>12:00</dt><dd>公寓退房（以訂房確認信為準）</dd></div>\n'
+    '          <div class="row"><dt>白天</dt><dd>尚未安排，出發前決定去哪、行李放哪</dd></div>\n'
+    '          <div class="row"><dt>~18:00</dt><dd>建議離開市區</dd></div>\n'
+    '          <div class="row"><dt>~19:30</dt><dd>建議抵達仁川 T1，留時間退稅與託運</dd></div>\n',
+    '<div class="row"><dt>~07:45</dt><dd>離開公寓（退房最晚 12:00，以訂房確認信為準），到弘益大學站寄放行李</dd></div>\n'
+    '          <div class="row"><dt>08:30</dt><dd>弘益大學站 4 號口（AK Plaza）集合，搭接駁車去驪州 Premium Outlets</dd></div>\n'
+    '          <div class="row"><dt>18:30</dt><dd>接駁車回到弘益大學站，取行李</dd></div>\n'
+    '          <div class="row"><dt>~20:00</dt><dd>預計抵達仁川 T1（估），留時間退稅與託運</dd></div>\n')
+sub('問公寓能否在 D1 入住前與 D5 退房後寄放行李。', '問公寓能否在 D1 入住前寄放行李。')
 
 # 航班區塊下面的「航班截圖」展開列（圖檔 src/flights.jpg 是訂票 App 的行程截圖，只有航線與時間，沒有姓名／訂位代號）
 SHOT_HTML = '''    <details class="shot">
@@ -815,7 +850,10 @@ shell = shell.replace('open(SP + \'seoul-routes.html\'', 'open(SP + \'seoul-rout
 shell = re.sub(r'    <li><a href="[^"]*(travel-stained|blog/3196|shilladfs)[^"]*"[^\n]*</li>\n', '', shell)
 _ewha_src = '    <li>樂天百貨明洞本店官網「機場交通方式」頁（你提供的截圖）</li>'
 assert shell.count(_ewha_src) == 1
-shell = shell.replace(_ewha_src, _ewha_src + '\n    <li><a href="https://ewha.ac.kr/ewhaen/intro/location.do" target="_blank" rel="noopener">梨花女子大學「交通」頁（機場到梨大：機場鐵路換 2 號線）</a></li>')
+shell = shell.replace(_ewha_src, _ewha_src + '\n    <li><a href="https://ewha.ac.kr/ewhaen/intro/location.do" target="_blank" rel="noopener">梨花女子大學「交通」頁（機場到梨大：機場鐵路換 2 號線）</a></li>'
+                      + '\n    <li><a href="https://www.klook.com/zh-TW/activity/191022-yeoju-premium-outlets-shuttle-bus-from-seoul/" target="_blank" rel="noopener">Klook 首爾出發至驪州 Premium Outlets 接駁巴士（D5 集合與回程時間）</a></li>'
+                      + '\n    <li><a href="https://creatrip.com/zh-CN/blog/5604" target="_blank" rel="noopener">Creatrip：弘大入口站行李寄放點（D5 置物櫃，部落格資料）</a></li>'
+                      + '\n    <li><a href="https://mediahub.seoul.go.kr/archives/1211515" target="_blank" rel="noopener">首爾市「地鐵 Happy Box」介紹（2019，置物櫃計費方式）</a></li>')
 shell = re.sub(r"<footer>\n  <p>.*?</p>\n  <ul>", "<footer>\n  <p>路線圖是示意，不是真實地圖。方向以月台的內環／外環標示為準。</p>\n  <details><summary>資料來源</summary>\n  <ul>", shell, flags=re.S)
 assert '<details>' in shell
 shell = shell.replace("  </ul>\n</footer>", "  </ul>\n  </details>\n</footer>")
